@@ -46,10 +46,30 @@ func WriteDeviceData(data []DeviceData) {
 	}
 	defer stmt.Close()
 
-	for _, d := range data {
+	mid := len(data) / 2
+	left := data[:mid]
+	right := data[mid:]
+
+	go func(right []DeviceData) {
+		for _, d := range right {
+			_, err := stmt.Exec(d.device_type, d.manufacturer, d.serial_number)
+			if err != nil {
+				ErrorLog.Fatalf("%v: executing prepared statement\n", err)
+			}
+		}
+	}(right)
+
+	for _, d := range left {
 		_, err := stmt.Exec(d.device_type, d.manufacturer, d.serial_number)
 		if err != nil {
 			ErrorLog.Fatalf("%v: executing prepared statement\n", err)
 		}
 	}
+
+	//for _, d := range data {
+	//	_, err := stmt.Exec(d.device_type, d.manufacturer, d.serial_number)
+	//	if err != nil {
+	//		ErrorLog.Fatalf("%v: executing prepared statement\n", err)
+	//	}
+	//}
 }
