@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"os"
+	"sync"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
@@ -39,6 +40,7 @@ func InitDatabase() *sql.DB {
 
 // WriteDeviceData writes the device data to the database from the csv file
 func WriteDeviceData(data []DeviceData) {
+	newWg := sync.WaitGroup{}
 	// Insert the data into the database using the prepared statement
 	stmt, err := db.Prepare("INSERT INTO devices(device_type, manufacturer, serial_number) VALUES(?, ?, ?)")
 	if err != nil {
@@ -51,12 +53,14 @@ func WriteDeviceData(data []DeviceData) {
 	right := data[mid:]
 
 	go func(stmt *sql.Stmt, right []DeviceData) {
+		newWg.Add(1)
 		for _, d := range right {
 			_, err := stmt.Exec(d.device_type, d.manufacturer, d.serial_number)
 			if err != nil {
-				ErrorLog.Fatalf("%v: executing prepared statement\n", err)
+				ErrorLog.Fatalf("%v: executing prepared statement within go func\n", err)
 			}
 		}
+		newWg.Done()
 	}(stmt, right)
 
 	for _, d := range left {
@@ -65,6 +69,7 @@ func WriteDeviceData(data []DeviceData) {
 			ErrorLog.Fatalf("%v: executing prepared statement\n", err)
 		}
 	}
+	newWg.Wait()
 
 	//for _, d := range data {
 	//	_, err := stmt.Exec(d.device_type, d.manufacturer, d.serial_number)
