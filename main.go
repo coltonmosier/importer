@@ -5,7 +5,7 @@ import (
 	"encoding/csv"
 	"io/fs"
 	"os"
-    "runtime/pprof"
+	"runtime/pprof"
 	"sync"
 	"time"
 )
@@ -22,12 +22,12 @@ var (
 const DATA_DIR = "/home/ubuntu/data/"
 
 func main() {
-    prof, errs := os.Create("myprogram.prof")
-    if errs != nil {
-        panic();
-    }
-    pprof.StartCPUProfile(prof)
-    defer pprof.StopCPUProfile()
+	prof, errs := os.Create("myprogram.prof")
+	if errs != nil {
+		panic(errs)
+	}
+	pprof.StartCPUProfile(prof)
+	defer pprof.StopCPUProfile()
 	fChan := make(chan fs.DirEntry)
 
 	db = InitDatabase()
