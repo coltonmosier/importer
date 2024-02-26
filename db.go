@@ -39,8 +39,7 @@ func InitDatabase() *sql.DB {
 
 // WriteDeviceData writes the device data to the database from the csv file
 func WriteDeviceData(data DeviceData) {
-	rows, err := db.Query("INSERT INTO devices(device_type, manufacturer, serial_number) VALUES(?, ?, ?)", data.device_type, data.manufacturer, data.serial_number)
-	defer rows.Close()
+	_, err := db.Exec("INSERT INTO devices(device_type, manufacturer, serial_number) VALUES(?, ?, ?)", data.device_type, data.manufacturer, data.serial_number)
 
 	if err != nil {
 		errString := "INSERT INTO devices(device_type, manufacturer, serial_number) VALUES(" + data.device_type + ", " + data.manufacturer + ", " + data.serial_number + ")"
