@@ -50,14 +50,14 @@ func WriteDeviceData(data []DeviceData) {
 	left := data[:mid]
 	right := data[mid:]
 
-	go func(right []DeviceData) {
+	go func(stmt *sql.Stmt, right []DeviceData) {
 		for _, d := range right {
 			_, err := stmt.Exec(d.device_type, d.manufacturer, d.serial_number)
 			if err != nil {
 				ErrorLog.Fatalf("%v: executing prepared statement\n", err)
 			}
 		}
-	}(right)
+	}(stmt, right)
 
 	for _, d := range left {
 		_, err := stmt.Exec(d.device_type, d.manufacturer, d.serial_number)
