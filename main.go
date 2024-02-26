@@ -95,7 +95,9 @@ func fileToDb(i int, f chan fs.DirEntry) {
 		d = append(d, data)
 
 		// Insert the data into the database
-		WriteDeviceData(d)
+		if len(d)%1000 == 0 {
+			WriteDeviceData(d)
+		}
 		count = len(d)
 	}
 
