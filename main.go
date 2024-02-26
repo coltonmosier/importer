@@ -95,10 +95,11 @@ func fileToDb(i int, f chan fs.DirEntry) {
 		d = append(d, data)
 
 		// Insert the data into the database
-		if len(d)%1000 == 0 {
+		if len(d) >= 500 {
 			WriteDeviceData(d)
+			d = nil
+			count += len(d)
 		}
-		count = len(d)
 	}
 
 	// Log the time for the queries in file
