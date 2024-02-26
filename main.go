@@ -94,14 +94,10 @@ func fileToDb(i int, f chan fs.DirEntry) {
 			continue
 		}
 		d = append(d, data)
-
-		// Insert the data into the database
 	}
 
 	WriteDeviceData(d)
-
 	count = len(d)
-	// Log the time for the queries in file
 	elapsed := time.Since(begin)
 	InfoLog.Println("Time for thread ", i, ": ", elapsed)
 	InfoLog.Printf("Rows per second: %.2f\n", float64(count)/elapsed.Seconds())
