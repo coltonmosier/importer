@@ -52,11 +52,4 @@ func WriteDeviceData(data []DeviceData) {
 			ErrorLog.Fatalf("%v: executing prepared statement\n", err)
 		}
 	}
-
-	//_, err := db.Exec("INSERT INTO devices(device_type, manufacturer, serial_number) VALUES(?, ?, ?)", data.device_type, data.manufacturer, data.serial_number)
-	//if err != nil {
-	//	errString := "INSERT INTO devices(device_type, manufacturer, serial_number) VALUES(" + data.device_type + ", " + data.manufacturer + ", " + data.serial_number + ")"
-	//	ErrorLog.Fatalf("%v\n\t%v", err, errString)
-	//}
-
 }

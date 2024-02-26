@@ -36,6 +36,7 @@ func main() {
 	if err != nil {
 		ErrorLog.Fatal(err)
 	}
+	db.SetMaxOpenConns(len(files))
 	// Start a timer that completes after all go routines are done
 	begin := time.Now()
 	// Start a go routine for each file
