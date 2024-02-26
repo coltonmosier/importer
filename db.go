@@ -38,12 +38,25 @@ func InitDatabase() *sql.DB {
 }
 
 // WriteDeviceData writes the device data to the database from the csv file
-func WriteDeviceData(data DeviceData) {
-	_, err := db.Exec("INSERT INTO devices(device_type, manufacturer, serial_number) VALUES(?, ?, ?)", data.device_type, data.manufacturer, data.serial_number)
-
+func WriteDeviceData(data []DeviceData) {
+	// Insert the data into the database using the prepared statement
+	stmt, err := db.Prepare("INSERT INTO devices(device_type, manufacturer, serial_number) VALUES(?, ?, ?)")
 	if err != nil {
-		errString := "INSERT INTO devices(device_type, manufacturer, serial_number) VALUES(" + data.device_type + ", " + data.manufacturer + ", " + data.serial_number + ")"
-		ErrorLog.Fatal(err, "\n\t", errString)
+		ErrorLog.Fatalf("%v: creating prepared statement\n", err)
 	}
+	defer stmt.Close()
+
+	for _, d := range data {
+		_, err := stmt.Exec(d.device_type, d.manufacturer, d.serial_number)
+		if err != nil {
+			ErrorLog.Fatalf("%v: executing prepared statement\n", err)
+		}
+	}
+
+	//_, err := db.Exec("INSERT INTO devices(device_type, manufacturer, serial_number) VALUES(?, ?, ?)", data.device_type, data.manufacturer, data.serial_number)
+	//if err != nil {
+	//	errString := "INSERT INTO devices(device_type, manufacturer, serial_number) VALUES(" + data.device_type + ", " + data.manufacturer + ", " + data.serial_number + ")"
+	//	ErrorLog.Fatalf("%v\n\t%v", err, errString)
+	//}
 
 }

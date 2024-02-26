@@ -55,6 +55,7 @@ func main() {
 
 // fileToDb will read the file and insert the data into the database and log the time it took concurrently
 func fileToDb(i int, f chan fs.DirEntry) {
+	var d []DeviceData
 	wg.Add(1)
 	defer wg.Done()
 	count := 0
@@ -91,10 +92,11 @@ func fileToDb(i int, f chan fs.DirEntry) {
 		if data == (DeviceData{}) {
 			continue
 		}
+		d = append(d, data)
 
 		// Insert the data into the database
-		WriteDeviceData(data)
-		count++
+		WriteDeviceData(d)
+		count = len(d)
 	}
 
 	// Log the time for the queries in file
