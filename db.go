@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"os"
-	"sync"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
