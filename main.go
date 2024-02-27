@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+/* GLOBALS */
 var (
 	db                 *sql.DB
 	InfoLog            = InitInfoLogger()
@@ -21,7 +22,6 @@ var (
 const DATA_DIR = "/home/ubuntu/data/"
 
 func main() {
-	fChan := make(chan fs.DirEntry)
 
 	db = InitDatabase()
 	defer db.Close()
@@ -37,9 +37,10 @@ func main() {
 		ErrorLog.Fatal(err)
 	}
 	db.SetMaxOpenConns(len(files))
-	// Start a timer that completes after all go routines are done
+	fChan := make(chan fs.DirEntry, len(files))
+
 	begin := time.Now()
-	// Start a go routine for each file
+
 	for i := range files {
 		go fileToDb(i+1, fChan)
 	}
@@ -60,7 +61,6 @@ func fileToDb(i int, f chan fs.DirEntry) {
 	wg.Add(1)
 	defer wg.Done()
 	count := 0
-	//InfoLog.Println("Starting thread: ", i)
 
 	// Get the file from the channel
 	dirEntry := <-f
