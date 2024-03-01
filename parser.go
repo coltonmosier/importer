@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"slices"
 	"strings"
+	"time"
 )
 
 var acceptedDeviceTypes = []string{"computer", "laptop", "mobile phone", "smart watch",
@@ -24,44 +26,50 @@ func ParseRecord(record []string) DeviceData {
 	}
 
 	if len(record) < 4 {
-		WarnLog.Printf("Invalid Record: missing fields [%s]\n", invalidRecord)
+        msg := fmt.Sprintf("Invalid Record: missing fields [%s]\n", invalidRecord)
+        Logger.AddWarn(Message{Message: msg, Time: time.Now()})
 		InvalidRecordCount++
 		return DeviceData{}
 	}
 
 	if len(record) > 4 {
-		WarnLog.Printf("Invalid Record: too many fields [%s]\n", invalidRecord)
+        msg := fmt.Sprintf("Invalid Record: too many fields [%s]\n", invalidRecord)
+        Logger.AddWarn(Message{Message: msg, Time: time.Now()})
 		InvalidRecordCount++
 		return DeviceData{}
 	}
 
 	if !slices.Contains(acceptedDeviceTypes, record[1]) {
-		WarnLog.Printf("Invalid Record: device_type invalid [%s]\n", invalidRecord)
+        msg := fmt.Sprintf("Invalid Record: device_type invalid [%s]\n", invalidRecord)
+        Logger.AddWarn(Message{Message: msg, Time: time.Now()})
 		InvalidRecordCount++
 		return DeviceData{}
 	}
 
 	if !slices.Contains(acceptedManufacturer, record[2]) {
-		WarnLog.Printf("Invalid Record: manufacturer invalid [%s]\n", invalidRecord)
+        msg := fmt.Sprintf("Invalid Record: manufacturer invalid [%s]\n", invalidRecord)
+        Logger.AddWarn(Message{Message: msg, Time: time.Now()})
 		InvalidRecordCount++
 		return DeviceData{}
 	}
 
 	if slices.Contains(SerialNumbers, record[3]) {
-		WarnLog.Printf("Invalid Record: serial_number already exists [%s]\n", invalidRecord)
+        msg := fmt.Sprintf("Invalid Record: serial_number already exists [%s]\n", invalidRecord)
+        Logger.AddWarn(Message{Message: msg, Time: time.Now()})
 		InvalidRecordCount++
 		return DeviceData{}
 	}
 
 	if !strings.HasPrefix(record[3], "SN-") {
-		WarnLog.Printf("Invalid Record: serial_number invalid or in wrong position [%s]\n",
-			invalidRecord)
+        msg := fmt.Sprintf("Invalid Record: serial_number invalid or in wrong position [%s]\n", invalidRecord)
+        Logger.AddWarn(Message{Message: msg, Time: time.Now()})
 		InvalidRecordCount++
 		return DeviceData{}
 	}
 
 	if len(record[3]) != 67 {
-		WarnLog.Printf("Invalid Record: serial_number invalid length [%s]\n", invalidRecord)
+        msg := fmt.Sprintf("Invalid Record: serial_number invalid length [%s]\n", invalidRecord)
+        Logger.AddWarn(Message{Message: msg, Time: time.Now()})
 		InvalidRecordCount++
 		return DeviceData{}
 	}

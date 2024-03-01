@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/csv"
+	"fmt"
 	"io/fs"
 	"log"
 	"os"
@@ -14,14 +15,12 @@ import (
 /* GLOBALS */
 var (
 	db                 *sql.DB
-	InfoLog            = InitInfoLogger()
-	WarnLog            = InitWarnLogger()
-	ErrorLog           = InitErrorLogger()
 	wg                 sync.WaitGroup
 	InvalidRecordCount = 0
 	Runs               = 1
 	Concurrency        int
     SerialNumbers = []string{}
+    Logger = Logs{}
 )
 
 const DATA_DIR = "/home/ubuntu/data/"
@@ -31,20 +30,20 @@ func main() {
 	defer db.Close()
     Concurrency, err := strconv.Atoi(os.Getenv("CONCURRENCY"))
     if err != nil {
-        ErrorLog.Fatal(err)
+        log.Fatal(err)
     }
 
     log.Println("Concurrency: ", Concurrency)
 
 	pingErr := db.Ping()
 	if pingErr != nil {
-		ErrorLog.Fatal(pingErr)
+		log.Fatal(pingErr)
 	}
-	InfoLog.Println("Connected to MySQL Test Database")
+    Logger.AddInfo(Message{Message: "Connected to MySQL Test Database", Time: time.Now()})
 
 	files, err := os.ReadDir(DATA_DIR)
 	if err != nil {
-		ErrorLog.Fatal(err)
+		log.Fatal(err)
 	}
 	db.SetMaxOpenConns(50)
 	db.SetMaxIdleConns(50)
@@ -70,8 +69,9 @@ func main() {
 	wg.Wait()
 
 	elapsed := time.Since(begin)
-	InfoLog.Println("Time for all queries: ", elapsed)
-	InfoLog.Println("Invalid records: ", InvalidRecordCount)
+    Logger.AddInfo(Message{Message: "Time for all queries: " + elapsed.String(), Time: time.Now()})
+    Logger.AddInfo(Message{Message: "Invalid records: " + strconv.Itoa(InvalidRecordCount), Time: time.Now()})
+    Logger.WriteLogs()
 }
 
 // fileToDb will read the file and insert the data into the database and log the time it took concurrently
@@ -82,7 +82,7 @@ func fileToDb(f fs.DirEntry) {
 	// Open the file
 	file, err := os.Open(DATA_DIR + f.Name())
 	if err != nil {
-		ErrorLog.Fatal(err)
+		log.Fatal(err)
 	}
 	defer file.Close()
 
@@ -119,7 +119,8 @@ func fileToDb(f fs.DirEntry) {
 	WriteDeviceData(d)
 	count += len(d)
 	elapsed := time.Since(begin)
-	InfoLog.Printf("Rows per second: %.2f in %v elapsed time on run %v\n", float64(count)/elapsed.Seconds(), elapsed, Runs)
+    msg := fmt.Sprintf("Rows per second: %f in %s elapsed time on run %d", float64(count)/elapsed.Seconds(), elapsed.String(), Runs)
+    Logger.AddInfo(Message{Message: msg, Time: time.Now()})
     log.Println(Runs, "completed")
 	Runs++
 	wg.Done()

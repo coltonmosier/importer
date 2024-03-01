@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"log"
 	"os"
 
 	"github.com/go-sql-driver/mysql"
@@ -17,7 +18,7 @@ type DeviceData struct {
 func InitDatabase() *sql.DB {
 	err := godotenv.Load()
 	if err != nil {
-		ErrorLog.Fatal("Error loading .env file ", err)
+		log.Fatal("Error loading .env file ", err)
 	}
 
 	cfg := mysql.Config{
@@ -31,7 +32,7 @@ func InitDatabase() *sql.DB {
 
 	db, err := sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
-		ErrorLog.Fatal(err)
+		log.Fatal(err)
 	}
 
 	return db
@@ -42,13 +43,13 @@ func WriteDeviceData(data []DeviceData) {
 	// Insert the data into the database using the prepared statement
 	stmt, err := db.Prepare("INSERT INTO devices(device_type, manufacturer, serial_number) VALUES(?, ?, ?)")
 	if err != nil {
-		ErrorLog.Fatalf("%v: creating prepared statement\n", err)
+		log.Fatalf("%v: creating prepared statement\n", err)
 	}
 
 	for _, d := range data {
 		_, err := stmt.Exec(d.device_type, d.manufacturer, d.serial_number)
 		if err != nil {
-			ErrorLog.Fatalf("%v: executing prepared statement %v\n", err, d)
+			log.Fatalf("%v: executing prepared statement %v\n", err, d)
 		}
 	}
     stmt.Close()
