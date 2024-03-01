@@ -7,7 +7,6 @@ import (
 	"os"
 	"sync"
 	"time"
-    "runtime/pprof"
 )
 
 /* GLOBALS */
@@ -18,18 +17,13 @@ var (
 	ErrorLog           = InitErrorLogger()
 	wg                 sync.WaitGroup
 	InvalidRecordCount = 0
+	Runs               = 1
+	Concurrency        = os.Getenv("CONCURRENCY")
 )
 
 const DATA_DIR = "/home/ubuntu/data/"
 
 func main() {
-    f, err := os.Create("cpu.prof")
-    if err != nil {
-        ErrorLog.Fatal(err)
-    }
-    pprof.StartCPUProfile(f)
-    defer pprof.StopCPUProfile()
-
 	db = InitDatabase()
 	defer db.Close()
 
@@ -44,27 +38,27 @@ func main() {
 		ErrorLog.Fatal(err)
 	}
 	db.SetMaxOpenConns(50)
-    db.SetMaxIdleConns(50)
+	db.SetMaxIdleConns(50)
 	fChan := make(chan fs.DirEntry, 5)
 
 	begin := time.Now()
-    for i := 0; i < 2; i++ {
-        go func() {
-            for file := range fChan {
-                fileToDb(file)
-                defer wg.Done()
-            }
-        }()
-    }
+	for i := 0; i < 2; i++ {
+		go func() {
+			for file := range fChan {
+				fileToDb(file)
+				defer wg.Done()
+			}
+		}()
+	}
 
-    // Loop through the files and send them to the channel
-    for _, file := range files {
-        fChan <- file
-    }
+	// Loop through the files and send them to the channel
+	for _, file := range files {
+		fChan <- file
+	}
 	close(fChan)
 
-    wg.Add(2)
-    wg.Wait()
+	wg.Add(2)
+	wg.Wait()
 
 	elapsed := time.Since(begin)
 	InfoLog.Println("Time for all queries: ", elapsed)
@@ -105,16 +99,17 @@ func fileToDb(f fs.DirEntry) {
 		}
 		d = append(d, data)
 
-        if len(d) == 1000 {
-            WriteDeviceData(d)
-            count += len(d)
-            d = nil
-        }
+		if len(d) == 1000 {
+			WriteDeviceData(d)
+			count += len(d)
+			d = nil
+		}
 
 	}
 
 	WriteDeviceData(d)
 	count += len(d)
 	elapsed := time.Since(begin)
-	InfoLog.Printf("Rows per second: %.2f in %v elapsed time.\n", float64(count)/elapsed.Seconds(), elapsed)
+	InfoLog.Printf("Rows per second: %.2f in %v elapsed time on run %v\n", float64(count)/elapsed.Seconds(), elapsed, Runs)
+	Runs++
 }
