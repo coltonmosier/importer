@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"io/fs"
 	"os"
+	"strings"
 	"sync"
 	"time"
 )
@@ -84,8 +85,8 @@ func fileToDb(i int, f chan fs.DirEntry) {
 			if err.Error() == "EOF" {
 				break
 			}
-            if err.Error() == "wrong number of fields in line" {
-                WarnLog.Println(err)
+            if strings.Compare(err.Error() ,"wrong number of fields in line") == 0 {
+                WarnLog.Println(err.Error())
                 InvalidRecordCount++
                 continue
             }
