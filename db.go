@@ -52,5 +52,4 @@ func WriteDeviceData(data []DeviceData) {
 		}
 	}
     stmt.Close()
-    DbWg.Done()
 }
