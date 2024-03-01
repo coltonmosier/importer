@@ -85,7 +85,6 @@ func fileToDb(i int, f chan fs.DirEntry) {
 			if err.Error() == "EOF" {
 				break
 			}
-			ErrorLog.Println(err.Error())
 		}
 
 		data := ParseRecord(record)
