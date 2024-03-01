@@ -18,6 +18,7 @@ var (
 	WarnLog            = InitWarnLogger()
 	ErrorLog           = InitErrorLogger()
 	wg                 sync.WaitGroup
+    DbWg               sync.WaitGroup
 	InvalidRecordCount = 0
 	Runs               = 1
 	Concurrency        int
@@ -109,13 +110,15 @@ func fileToDb(f fs.DirEntry) {
 		d = append(d, data)
 
 		if len(d) == 5000 {
-			WriteDeviceData(d)
+            DbWg.Add(1)
+			go WriteDeviceData(d)
 			count += len(d)
 			d = nil
 		}
 
 	}
 
+    DbWg.Wait()
 	WriteDeviceData(d)
 	count += len(d)
 	elapsed := time.Since(begin)
