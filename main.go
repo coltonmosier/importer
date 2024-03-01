@@ -85,9 +85,6 @@ func fileToDb(i int, f chan fs.DirEntry) {
 			if err.Error() == "EOF" {
 				break
 			}
-            if strings.Contains(err.Error(), "wrong number of fields") {
-                break
-            }
 			ErrorLog.Println(err.Error())
 		}
 
