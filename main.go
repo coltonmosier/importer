@@ -52,8 +52,8 @@ func main() {
 
 	begin := time.Now()
 
-	wg.Add(Concurrency)
 	for i := 0; i < Concurrency; i++ {
+        wg.Add(1)
 		go func() {
 			for file := range fChan {
 				fileToDb(file)
@@ -76,7 +76,6 @@ func main() {
 
 // fileToDb will read the file and insert the data into the database and log the time it took concurrently
 func fileToDb(f fs.DirEntry) {
-	defer wg.Done()
 	var d []DeviceData
 	count := 0
 
@@ -123,4 +122,5 @@ func fileToDb(f fs.DirEntry) {
 	InfoLog.Printf("Rows per second: %.2f in %v elapsed time on run %v\n", float64(count)/elapsed.Seconds(), elapsed, Runs)
     log.Println(Runs, "completed")
 	Runs++
+	wg.Done()
 }
