@@ -51,11 +51,12 @@ func main() {
 	fChan := make(chan fs.DirEntry, 5)
 
 	begin := time.Now()
+
+	wg.Add(Concurrency)
 	for i := 0; i < Concurrency; i++ {
 		go func() {
 			for file := range fChan {
 				fileToDb(file)
-				defer wg.Done()
 			}
 		}()
 	}
@@ -66,7 +67,6 @@ func main() {
 	}
 	close(fChan)
 
-	wg.Add(Concurrency)
 	wg.Wait()
 
 	elapsed := time.Since(begin)
@@ -76,6 +76,7 @@ func main() {
 
 // fileToDb will read the file and insert the data into the database and log the time it took concurrently
 func fileToDb(f fs.DirEntry) {
+	defer wg.Done()
 	var d []DeviceData
 	count := 0
 
@@ -108,7 +109,7 @@ func fileToDb(f fs.DirEntry) {
 		}
 		d = append(d, data)
 
-		if len(d) == 10000 {
+		if len(d) == 5000 {
 			WriteDeviceData(d)
 			count += len(d)
 			d = nil
