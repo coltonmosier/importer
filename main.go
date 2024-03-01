@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"encoding/csv"
 	"io/fs"
+	"log"
 	"os"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -18,7 +20,7 @@ var (
 	wg                 sync.WaitGroup
 	InvalidRecordCount = 0
 	Runs               = 1
-	Concurrency        = os.Getenv("CONCURRENCY")
+	Concurrency        int
 )
 
 const DATA_DIR = "/home/ubuntu/data/"
@@ -26,6 +28,12 @@ const DATA_DIR = "/home/ubuntu/data/"
 func main() {
 	db = InitDatabase()
 	defer db.Close()
+    Concurrency, err := strconv.Atoi(os.Getenv("CONCURRENCY"))
+    if err != nil {
+        ErrorLog.Fatal(err)
+    }
+
+    log.Println("Concurrency: ", Concurrency)
 
 	pingErr := db.Ping()
 	if pingErr != nil {
@@ -42,7 +50,7 @@ func main() {
 	fChan := make(chan fs.DirEntry, 5)
 
 	begin := time.Now()
-	for i := 0; i < 2; i++ {
+	for i := 0; i < Concurrency; i++ {
 		go func() {
 			for file := range fChan {
 				fileToDb(file)
