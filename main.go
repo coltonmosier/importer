@@ -37,20 +37,18 @@ func main() {
 		ErrorLog.Fatal(err)
 	}
 	db.SetMaxOpenConns(len(files))
-	fChan := make(chan fs.DirEntry, len(files))
+	fChan := make(chan fs.DirEntry, 10)
 
 	begin := time.Now()
 
-	for i := range files {
+	for i, file := range files {
+		fChan <- file
 		go fileToDb(i+1, fChan)
 	}
+	close(fChan)
 
-	for _, file := range files {
-		fChan <- file
-	}
     wg.Add(len(files))
 	wg.Wait()
-	close(fChan)
 	elapsed := time.Since(begin)
 	InfoLog.Println("Time for all queries: ", elapsed)
 	InfoLog.Println("Invalid records: ", InvalidRecordCount)
