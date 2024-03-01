@@ -120,5 +120,6 @@ func fileToDb(f fs.DirEntry) {
 	count += len(d)
 	elapsed := time.Since(begin)
 	InfoLog.Printf("Rows per second: %.2f in %v elapsed time on run %v\n", float64(count)/elapsed.Seconds(), elapsed, Runs)
+    log.Println(Runs, "completed")
 	Runs++
 }
