@@ -10,7 +10,6 @@ var acceptedDeviceTypes = []string{"computer", "laptop", "mobile phone", "smart 
 var acceptedManufacturer = []string{"Apple", "Chevorlet", "Dell", "Ford", "GM", "Google", "HP",
 	"Hisense", "Huawei", "Hyundai", "IBM", "KIA", "LG", "Microsoft", "Motorola", "Nissan", "Nokia",
 	"OnePlus", "Panasonic", "Samsung", "Sony", "TCL", "Toyota", "Vizio"}
-var serialNumbers = []string{}
 
 // Parse will parse the csv file and return a DeviceData struct and will handle error/logging
 func ParseRecord(record []string) DeviceData {
@@ -48,7 +47,7 @@ func ParseRecord(record []string) DeviceData {
 		return DeviceData{}
 	}
 
-	if slices.Contains(serialNumbers, record[3]) {
+	if slices.Contains(SerialNumbers, record[3]) {
 		WarnLog.Printf("Invalid Record: serial_number already exists [%s]\n", invalidRecord)
 		InvalidRecordCount++
 		return DeviceData{}
@@ -67,7 +66,7 @@ func ParseRecord(record []string) DeviceData {
 		return DeviceData{}
 	}
 
-	serialNumbers = append(serialNumbers, record[3])
+	SerialNumbers = append(SerialNumbers, record[3])
 
 	return DeviceData{
 		device_type:   record[1],

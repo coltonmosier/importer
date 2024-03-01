@@ -21,6 +21,7 @@ var (
 	InvalidRecordCount = 0
 	Runs               = 1
 	Concurrency        int
+    SerialNumbers = []string{}
 )
 
 const DATA_DIR = "/home/ubuntu/data/"
@@ -65,7 +66,7 @@ func main() {
 	}
 	close(fChan)
 
-	wg.Add(2)
+	wg.Add(Concurrency)
 	wg.Wait()
 
 	elapsed := time.Since(begin)
@@ -107,7 +108,7 @@ func fileToDb(f fs.DirEntry) {
 		}
 		d = append(d, data)
 
-		if len(d) == 1000 {
+		if len(d) == 10000 {
 			WriteDeviceData(d)
 			count += len(d)
 			d = nil
