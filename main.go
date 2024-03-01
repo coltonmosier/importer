@@ -7,6 +7,7 @@ import (
 	"os"
 	"sync"
 	"time"
+    "runtime/pprof"
 )
 
 /* GLOBALS */
@@ -22,6 +23,12 @@ var (
 const DATA_DIR = "/home/ubuntu/data/"
 
 func main() {
+    f, err := os.Create("cpu.prof")
+    if err != nil {
+        ErrorLog.Fatal(err)
+    }
+    pprof.StartCPUProfile(f)
+    defer pprof.StopCPUProfile()
 
 	db = InitDatabase()
 	defer db.Close()
