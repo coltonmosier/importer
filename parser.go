@@ -5,7 +5,6 @@ import (
 	"strings"
 )
 
-
 var acceptedDeviceTypes = []string{"computer", "laptop", "mobile phone", "smart watch",
 	"tablet", "television", "vehicle"}
 var acceptedManufacturer = []string{"Apple", "Chevorlet", "Dell", "Ford", "GM", "Google", "HP",
@@ -18,12 +17,12 @@ func ParseRecord(record []string) DeviceData {
 
 	invalidRecord := strings.Join(record, ",")
 
-    // strip single quotes
-    for i := 1; i < len(record); i++ {
-        if strings.Contains(record[i], "'") {
+	// strip single quotes
+	for i := 1; i < len(record); i++ {
+		if strings.Contains(record[i], "'") {
 			record[i] = strings.ReplaceAll(record[i], "'", "")
-        }
-    }
+		}
+	}
 
 	if len(record) < 4 {
 		WarnLog.Printf("Invalid Record: missing fields [%s]\n", invalidRecord)
@@ -49,11 +48,11 @@ func ParseRecord(record []string) DeviceData {
 		return DeviceData{}
 	}
 
-    if slices.Contains(serialNumbers, record[3]) {
-        WarnLog.Printf("Invalid Record: serial_number already exists [%s]\n", invalidRecord)
-        InvalidRecordCount++
-        return DeviceData{}
-    }
+	if slices.Contains(serialNumbers, record[3]) {
+		WarnLog.Printf("Invalid Record: serial_number already exists [%s]\n", invalidRecord)
+		InvalidRecordCount++
+		return DeviceData{}
+	}
 
 	if !strings.HasPrefix(record[3], "SN-") {
 		WarnLog.Printf("Invalid Record: serial_number invalid or in wrong position [%s]\n",
@@ -62,13 +61,13 @@ func ParseRecord(record []string) DeviceData {
 		return DeviceData{}
 	}
 
-    if len(record[3]) != 67 {
-        WarnLog.Printf("Invalid Record: serial_number invalid length [%s]\n", invalidRecord)
-        InvalidRecordCount++
-        return DeviceData{}
-    }
+	if len(record[3]) != 67 {
+		WarnLog.Printf("Invalid Record: serial_number invalid length [%s]\n", invalidRecord)
+		InvalidRecordCount++
+		return DeviceData{}
+	}
 
-    serialNumbers = append(serialNumbers, record[3])
+	serialNumbers = append(serialNumbers, record[3])
 
 	return DeviceData{
 		device_type:   record[1],
