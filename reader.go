@@ -9,6 +9,7 @@ import (
 
 func fileToStruct(f fs.DirEntry, dChan chan []DeviceData) {
 	var d []DeviceData
+    var re [][]string
 
 	// Open the file
 	file, err := os.Open(DATA_DIR + f.Name())
@@ -29,16 +30,17 @@ func fileToStruct(f fs.DirEntry, dChan chan []DeviceData) {
 				break
 			}
 		}
-
-		data := ParseRecord(record)
-		// If the data is empty, skip it
-		if data == (DeviceData{}) {
-			continue
-		}
-
-		d = append(d, data)
-
+        re = append(re, record)
 	}
+
+    for _, record := range re {
+        data := ParseRecord(record)
+        if data == (DeviceData{}) {
+            continue
+        }
+        d = append(d, data)
+    }
+
     dChan <- d
 	wg.Done()
 }
