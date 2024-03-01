@@ -7,9 +7,14 @@ import (
 	"os"
 )
 
-func fileToStruct(f fs.DirEntry, dChan chan []DeviceData) {
+func fileToStruct(i int, fc chan fs.DirEntry, dChan chan []DeviceData) {
+
+	f := <-fc
+
+	log.Println("Processing file: ", i)
+
 	var d []DeviceData
-    var re [][]string
+	var re [][]string
 
 	// Open the file
 	file, err := os.Open(DATA_DIR + f.Name())
@@ -30,17 +35,19 @@ func fileToStruct(f fs.DirEntry, dChan chan []DeviceData) {
 				break
 			}
 		}
-        re = append(re, record)
+		re = append(re, record)
 	}
 
-    for _, record := range re {
-        data := ParseRecord(record)
-        if data == (DeviceData{}) {
-            continue
-        }
-        d = append(d, data)
-    }
+	log.Println("file:", i, "records read", len(re))
 
-    dChan <- d
+	for _, record := range re {
+		data := ParseRecord(record)
+		if data == (DeviceData{}) {
+			continue
+		}
+		d = append(d, data)
+	}
+
+	dChan <- d
 	wg.Done()
 }

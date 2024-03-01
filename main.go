@@ -51,15 +51,10 @@ func main() {
 	fChan := make(chan fs.DirEntry, 5)
 	dChan := make(chan []DeviceData)
 
-	for i := 0; i < Concurrency; i++ {
-		wg.Add(1)
-		go func() {
-			for file := range fChan {
-				fileToStruct(file, dChan)
-			}
-		}()
-	}
-
+    for i := range files {
+        wg.Add(1)
+        go fileToStruct(i+1,fChan, dChan)
+    }
 	// Loop through the files and send them to the channel
 	for _, file := range files {
 		fChan <- file
