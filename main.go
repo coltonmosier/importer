@@ -85,7 +85,7 @@ func fileToDb(i int, f chan fs.DirEntry) {
 			if err.Error() == "EOF" {
 				break
 			}
-            if strings.Compare(err.Error() ,"wrong number of fields in line") == 0 {
+            if strings.Contains(err.Error() ,"wrong number of fields") {
                 WarnLog.Println(err.Error())
                 InvalidRecordCount++
                 continue
