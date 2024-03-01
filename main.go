@@ -93,6 +93,12 @@ func fileToDb(i int, f chan fs.DirEntry) {
 		}
 		d = append(d, data)
 
+        if len(d) == 1250 {
+            WriteDeviceData(d)
+            count += len(d)
+            d = nil
+        }
+
 	}
 
 	WriteDeviceData(d)
