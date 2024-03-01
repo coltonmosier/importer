@@ -48,30 +48,36 @@ func main() {
 	fChan := make(chan fs.DirEntry, 5)
 
 	begin := time.Now()
+    for i := 0; i < 2; i++ {
+        go func() {
+            for file := range fChan {
+                fileToDb(file)
+                defer wg.Done()
+            }
+        }()
+    }
 
-	for i, file := range files {
-		fChan <- file
-		go fileToDb(i+1, fChan)
-	}
+    // Loop through the files and send them to the channel
+    for _, file := range files {
+        fChan <- file
+    }
 	close(fChan)
 
-    wg.Add(len(files))
-	wg.Wait()
+    wg.Add(2)
+    wg.Wait()
+
 	elapsed := time.Since(begin)
 	InfoLog.Println("Time for all queries: ", elapsed)
 	InfoLog.Println("Invalid records: ", InvalidRecordCount)
 }
 
 // fileToDb will read the file and insert the data into the database and log the time it took concurrently
-func fileToDb(i int, f chan fs.DirEntry) {
+func fileToDb(f fs.DirEntry) {
 	var d []DeviceData
 	count := 0
 
-	// Get the file from the channel
-	dirEntry := <-f
-
 	// Open the file
-	file, err := os.Open(DATA_DIR + dirEntry.Name())
+	file, err := os.Open(DATA_DIR + f.Name())
 	if err != nil {
 		ErrorLog.Fatal(err)
 	}
@@ -99,7 +105,7 @@ func fileToDb(i int, f chan fs.DirEntry) {
 		}
 		d = append(d, data)
 
-        if len(d) == 10000 {
+        if len(d) == 1000 {
             WriteDeviceData(d)
             count += len(d)
             d = nil
@@ -110,7 +116,5 @@ func fileToDb(i int, f chan fs.DirEntry) {
 	WriteDeviceData(d)
 	count += len(d)
 	elapsed := time.Since(begin)
-	InfoLog.Println("Time for thread ", i, ": ", elapsed)
-	InfoLog.Printf("Rows per second: %.2f\n", float64(count)/elapsed.Seconds())
-    wg.Done()
+	InfoLog.Printf("Rows per second: %.2f in %v elapsed time.\n", float64(count)/elapsed.Seconds(), elapsed)
 }
