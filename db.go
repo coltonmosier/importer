@@ -38,9 +38,7 @@ func InitDatabase() *sql.DB {
 	return db
 }
 
-// WriteDeviceData writes the device data to the database from the csv file
 func WriteDeviceData(data []DeviceData) {
-	// Insert the data into the database using the prepared statement
 	stmt, err := db.Prepare("INSERT INTO devices(device_type, manufacturer, serial_number) VALUES(?, ?, ?)")
 	if err != nil {
 		log.Fatalf("%v: creating prepared statement\n", err)
