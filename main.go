@@ -85,7 +85,7 @@ func fileToDb(i int, f chan fs.DirEntry) {
 				break
 			}
             if err.Error() == "wrong number of fields in line" {
-                InfoLog.Printf("Invalid Record: no records found [%v]\n", record)
+                WarnLog.Println(err)
                 InvalidRecordCount++
                 continue
             }
