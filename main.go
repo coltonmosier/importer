@@ -48,6 +48,7 @@ func main() {
 	for _, file := range files {
 		fChan <- file
 	}
+    wg.Add(len(files))
 	wg.Wait()
 	close(fChan)
 	elapsed := time.Since(begin)
@@ -58,8 +59,6 @@ func main() {
 // fileToDb will read the file and insert the data into the database and log the time it took concurrently
 func fileToDb(i int, f chan fs.DirEntry) {
 	var d []DeviceData
-	wg.Add(1)
-	defer wg.Done()
 	count := 0
 
 	// Get the file from the channel
@@ -85,6 +84,11 @@ func fileToDb(i int, f chan fs.DirEntry) {
 			if err.Error() == "EOF" {
 				break
 			}
+            if err.Error() == "wrong number of fields in line" {
+                InfoLog.Printf("Invalid Record: no records found [%v]\n", record)
+                InvalidRecordCount++
+                continue
+            }
 			ErrorLog.Fatal(err)
 		}
 
@@ -102,4 +106,5 @@ func fileToDb(i int, f chan fs.DirEntry) {
 	elapsed := time.Since(begin)
 	InfoLog.Println("Time for thread ", i, ": ", elapsed)
 	InfoLog.Printf("Rows per second: %.2f\n", float64(count)/elapsed.Seconds())
+    wg.Done()
 }
