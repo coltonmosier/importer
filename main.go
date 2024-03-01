@@ -85,8 +85,10 @@ func fileToDb(i int, f chan fs.DirEntry) {
 			if err.Error() == "EOF" {
 				break
 			}
-			ErrorLog.Println(err)
-            InvalidRecordCount++
+            if strings.Contains(err.Error(), "wrong number of fields") {
+                break
+            }
+			ErrorLog.Println(err.Error())
 		}
 
 		data := ParseRecord(record)

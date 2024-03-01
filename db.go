@@ -49,7 +49,7 @@ func WriteDeviceData(data []DeviceData) {
 	for _, d := range data {
 		_, err := stmt.Exec(d.device_type, d.manufacturer, d.serial_number)
 		if err != nil {
-			ErrorLog.Fatalf("%v: executing prepared statement\n", err)
+			ErrorLog.Fatalf("%v: executing prepared statement %v\n", err, d)
 		}
 	}
 }
