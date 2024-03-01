@@ -36,7 +36,7 @@ func main() {
 	if err != nil {
 		ErrorLog.Fatal(err)
 	}
-	db.SetMaxOpenConns(len(files))
+	db.SetMaxOpenConns(15)
 	fChan := make(chan fs.DirEntry, 10)
 
 	begin := time.Now()
