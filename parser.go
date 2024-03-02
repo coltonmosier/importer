@@ -23,6 +23,7 @@ func ParseRecord(r [][]string) []DeviceData {
 
 		// strip single quotes
 		for i := 1; i < len(record); i++ {
+            fmt.Println("checking for single quote")
 			if strings.Contains(record[i], "'") {
 				record[i] = strings.ReplaceAll(record[i], "'", "")
 			}

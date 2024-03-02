@@ -10,6 +10,7 @@ import (
 func fileToStruct(i int, fc <-chan fs.DirEntry, dChan chan<- []DeviceData) {
 
 	f := <-fc
+    defer wg.Done()
 
 	log.Println("Processing file: ", i)
 
@@ -45,5 +46,4 @@ func fileToStruct(i int, fc <-chan fs.DirEntry, dChan chan<- []DeviceData) {
 	log.Println("records ready to write", len(d))
 
 	dChan <- d
-	wg.Done()
 }
