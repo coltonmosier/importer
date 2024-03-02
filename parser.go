@@ -20,7 +20,7 @@ func ParseRecord(r [][]string) []DeviceData {
 
 	for i, record := range r {
         if i % 1000 == 0 {
-            time.Sleep(10 * time.Millisecond)
+            time.Sleep(50 * time.Millisecond)
         }
 		invalidRecord := strings.Join(record, ",")
 
