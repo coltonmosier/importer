@@ -61,6 +61,7 @@ func ParseRecord(r [][]string) []DeviceData {
 			continue
 		}
 
+        fmt.Println("Locking")
 		mu.Lock()
 		if slices.Contains(SerialNumbers, record[3]) {
             fmt.Println("SN exists")
@@ -70,6 +71,7 @@ func ParseRecord(r [][]string) []DeviceData {
 			continue
 		}
 		mu.Unlock()
+        fmt.Println("Unlocking")
 
 		if !strings.HasPrefix(record[3], "SN-") {
             fmt.Println("SN wrong")
@@ -87,9 +89,11 @@ func ParseRecord(r [][]string) []DeviceData {
 			continue
 		}
 
+        fmt.Println("Locking")
 		mu.Lock()
 		SerialNumbers = append(SerialNumbers, record[3])
 		mu.Unlock()
+        fmt.Println("Unlocking")
 
 		d = append(d, DeviceData{
 			device_type:   record[1],

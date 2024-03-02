@@ -54,20 +54,18 @@ func main() {
 	// DeviceData channel
 	dChan := make(chan []DeviceData)
 
-	for i := range Concurrency {
-		wg.Add(1)
-		go fileToStruct(i+1, fChan, dChan)
-	}
+	wg.Add(1)
+	go fileToStruct(1, fChan, dChan)
 	// Loop through the files and send them to the channel
 	// acts like a semaphore
 	for _, file := range files {
 		fChan <- file
 	}
-	close(fChan)
 
 	d := <-dChan
-	close(dChan)
 	wg.Wait() // we know all files have been read and processed
+	close(fChan)
+	close(dChan)
 
 	log.Println("size of data from files: ", len(d))
 
