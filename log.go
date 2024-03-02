@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 )
 
 const (
@@ -11,29 +12,63 @@ const (
 	ERROR_LOG_FILE = "/home/ubuntu/logs/importer_error.log"
 )
 
-// InitInfoLogger initializes the info logger should be used for general information
-func InitInfoLogger() *log.Logger {
-	file, err := os.OpenFile(INFO_LOG_FILE, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return log.New(file, "[INFO]: ", log.Ldate|log.Ltime|log.Lmsgprefix)
+// Struct to hold logging information for the application
+type Logs struct {
+	Info  []string
+	Warn  []string
+	Error []string
 }
 
-// InitErrorLogger initializes the error logger should be used for fatal errors
-func InitErrorLogger() *log.Logger {
-	file, err := os.OpenFile(ERROR_LOG_FILE, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return log.New(file, "[ERROR]: ", log.Ldate|log.Ltime|log.Lmsgprefix)
+type Message struct {
+	Message string
+	Time    time.Time
 }
 
-// InitWarnLogger initializes the warn logger should be used for non-fatal errors
-func InitWarnLogger() *log.Logger {
-	file, err := os.OpenFile(WARN_LOG_FILE, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+func (l *Logs) AddInfo(msg Message) {
+	dt := msg.Time.Format("2006/01/02 15:04:05")
+	l.Info = append(l.Info, dt+"[INFO]"+msg.Message)
+}
+func (l *Logs) AddWarn(msg Message) {
+	dt := msg.Time.Format("2006/01/02 15:04:05")
+	l.Warn = append(l.Warn, dt+"[WARN]"+msg.Message)
+}
+func (l *Logs) AddErr(msg Message) {
+	dt := msg.Time.Format("2006/01/02 15:04:05")
+	l.Error = append(l.Error, dt+"[ERROR]"+msg.Message)
+}
+
+func (l *Logs) ClearLogs() {
+    l.Info = []string{}
+    l.Warn = []string{}
+    l.Error = []string{}
+}
+
+func (l *Logs) WriteLogs() {
+	infoFile, err := os.OpenFile(INFO_LOG_FILE, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return log.New(file, "[WARN]: ", log.Ldate|log.Ltime|log.Lmsgprefix)
+	defer infoFile.Close()
+	for _, msg := range l.Info {
+		infoFile.WriteString(msg)
+	}
+
+	warnFile, err := os.OpenFile(WARN_LOG_FILE, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer warnFile.Close()
+	for _, msg := range l.Warn {
+		warnFile.WriteString(msg)
+	}
+
+	errorFile, err := os.OpenFile(ERROR_LOG_FILE, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer errorFile.Close()
+	for _, msg := range l.Error {
+		errorFile.WriteString(msg)
+	}
+    l.ClearLogs()
 }

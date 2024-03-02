@@ -18,9 +18,7 @@ var (
 	InvalidRecordCount = 0
 	Concurrency        int
 	SerialNumbers      = []string{}
-	LogInfo            = InitInfoLogger()
-	LogWarn            = InitWarnLogger()
-	LogErr             = InitErrorLogger()
+	Logger             = Logs{}
 )
 
 const DATA_DIR = "/home/ubuntu/data/"
@@ -71,7 +69,7 @@ func main() {
 	d := <-dChan
 	close(dChan)
 	wg.Wait() // we know all files have been read and processed
-	for _ = range Concurrency {
+	for range Concurrency {
 		wg.Add(1)
 		go WriteDeviceData(wChan)
 	}
@@ -85,6 +83,7 @@ func main() {
 	log.Println("size of data from files: ", len(d))
 
 	elapsed := time.Since(begin)
-    LogInfo.Println("Time for all queries:", elapsed)
-    LogInfo.Println("Invalid records:", InvalidRecordCount)
+    Logger.AddInfo(Message{"Time for all queries: " + elapsed.String(), time.Now()})
+    Logger.AddInfo(Message{"Invalid records: " + strconv.Itoa(InvalidRecordCount), time.Now()})
+    Logger.WriteLogs()
 }
