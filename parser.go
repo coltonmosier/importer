@@ -32,6 +32,7 @@ func ParseRecord(r [][]string) []DeviceData {
 			msg := fmt.Sprintf("Invalid Record: missing fields [%s]\n", invalidRecord)
 			Logger.AddWarn(Message{Message: msg, Time: time.Now()})
 			InvalidRecordCount++
+            fmt.Println("too short")
 			continue
 		}
 
@@ -39,6 +40,7 @@ func ParseRecord(r [][]string) []DeviceData {
 			msg := fmt.Sprintf("Invalid Record: too many fields [%s]\n", invalidRecord)
 			Logger.AddWarn(Message{Message: msg, Time: time.Now()})
 			InvalidRecordCount++
+            fmt.Println("too long")
 			continue
 		}
 
@@ -46,6 +48,7 @@ func ParseRecord(r [][]string) []DeviceData {
 			msg := fmt.Sprintf("Invalid Record: device_type invalid [%s]\n", invalidRecord)
 			Logger.AddWarn(Message{Message: msg, Time: time.Now()})
 			InvalidRecordCount++
+            fmt.Println("device wrong")
 			continue
 		}
 
@@ -53,6 +56,7 @@ func ParseRecord(r [][]string) []DeviceData {
 			msg := fmt.Sprintf("Invalid Record: manufacturer invalid [%s]\n", invalidRecord)
 			Logger.AddWarn(Message{Message: msg, Time: time.Now()})
 			InvalidRecordCount++
+            fmt.Println("manu wrong")
 			continue
 		}
 
@@ -61,6 +65,7 @@ func ParseRecord(r [][]string) []DeviceData {
 			msg := fmt.Sprintf("Invalid Record: serial_number already exists [%s]\n", invalidRecord)
 			Logger.AddWarn(Message{Message: msg, Time: time.Now()})
 			InvalidRecordCount++
+            fmt.Println("SN exists")
 			continue
 		}
 		mu.Unlock()
@@ -69,6 +74,7 @@ func ParseRecord(r [][]string) []DeviceData {
 			msg := fmt.Sprintf("Invalid Record: serial_number invalid or in wrong position [%s]\n", invalidRecord)
 			Logger.AddWarn(Message{Message: msg, Time: time.Now()})
 			InvalidRecordCount++
+            fmt.Println("SN wrong")
 			continue
 		}
 
@@ -76,6 +82,7 @@ func ParseRecord(r [][]string) []DeviceData {
 			msg := fmt.Sprintf("Invalid Record: serial_number invalid length [%s]\n", invalidRecord)
 			Logger.AddWarn(Message{Message: msg, Time: time.Now()})
 			InvalidRecordCount++
+            fmt.Println("SN len")
 			continue
 		}
 
@@ -88,6 +95,7 @@ func ParseRecord(r [][]string) []DeviceData {
 			manufacturer:  record[2],
 			serial_number: record[3],
 		})
+        fmt.Println("Added to d:", len(d), "failed:", InvalidRecordCount)
 	}
 	return d
 }
