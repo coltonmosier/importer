@@ -18,7 +18,10 @@ func ParseRecord(r [][]string) []DeviceData {
 
 	var d []DeviceData
 
-	for _, record := range r {
+	for i, record := range r {
+        if i % 1000 == 0 {
+            time.Sleep(10 * time.Millisecond)
+        }
 		invalidRecord := strings.Join(record, ",")
 
 		// strip single quotes
@@ -64,6 +67,7 @@ func ParseRecord(r [][]string) []DeviceData {
 			InvalidRecordCount++
 			continue
 		}
+        mu.Unlock()
 
 		if !strings.HasPrefix(record[3], "SN-") {
 			msg := fmt.Sprintf("Invalid Record: serial_number invalid or in wrong position [%s]\n", invalidRecord)
@@ -88,7 +92,6 @@ func ParseRecord(r [][]string) []DeviceData {
 			manufacturer:  record[2],
 			serial_number: record[3],
 		})
-		fmt.Println("Added to d:", len(d), "failed:", InvalidRecordCount)
 	}
 	return d
 }
