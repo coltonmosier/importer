@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func fileToStruct(i int, fc chan fs.DirEntry, dChan chan []DeviceData) {
+func fileToStruct(i int, fc <-chan fs.DirEntry, dChan chan<- []DeviceData) {
 
 	f := <-fc
 
@@ -40,13 +40,9 @@ func fileToStruct(i int, fc chan fs.DirEntry, dChan chan []DeviceData) {
 
 	log.Println("file:", i, "records read", len(re))
 
-	for _, record := range re {
-		data := ParseRecord(record)
-		if data == (DeviceData{}) {
-			continue
-		}
-		d = append(d, data)
-	}
+    d = ParseRecord(re)
+
+	log.Println("records ready to write", len(d))
 
 	dChan <- d
 	wg.Done()
