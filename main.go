@@ -52,33 +52,19 @@ func main() {
 	// fs.DirEntry channel
 	fChan := make(chan fs.DirEntry, 5)
 	// DeviceData channel
-	dChan := make(chan [][]DeviceData)
-	wChan := make(chan []DeviceData, 1250)
+    var d []DeviceData
 
-	for i := range Concurrency {
-		wg.Add(1)
-		go fileToStruct(i+1, fChan, dChan)
-	}
+
 	// Loop through the files and send them to the channel
 	// acts like a semaphore
-	for _, file := range files {
+	for i, file := range files {
 		fChan <- file
+        go func() {
+            d = append(d, fileToStruct(i, file)...)
+            <-fChan
+        }()
 	}
 	close(fChan)
-
-	d := <-dChan
-	close(dChan)
-	wg.Wait() // we know all files have been read and processed
-	for range Concurrency {
-		wg.Add(1)
-		go WriteDeviceData(wChan)
-	}
-
-	for _, data := range d {
-		wChan <- data
-	}
-	close(wChan)
-	wg.Wait()
 
 	log.Println("size of data from files: ", len(d))
 

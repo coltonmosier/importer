@@ -7,17 +7,15 @@ import (
 	"os"
 )
 
-func fileToStruct(i int, fc <-chan fs.DirEntry, dChan chan<- [][]DeviceData) {
+func fileToStruct(i int, fc fs.DirEntry) []DeviceData {
 
-	f := <-fc
-    defer wg.Done()
 
 
 	var d []DeviceData
 	var re [][]string
 
 	// Open the file
-	file, err := os.Open(DATA_DIR + f.Name())
+	file, err := os.Open(DATA_DIR + fc.Name())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -40,7 +38,6 @@ func fileToStruct(i int, fc <-chan fs.DirEntry, dChan chan<- [][]DeviceData) {
 
     log.Println("Time to parse:", i)
     d = ParseRecord(re)
-    res := [][]DeviceData{d}
 
-	dChan <- res
+    return d
 }
