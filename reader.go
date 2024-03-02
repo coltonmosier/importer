@@ -7,12 +7,11 @@ import (
 	"os"
 )
 
-func fileToStruct(i int, fc <-chan fs.DirEntry, dChan chan<- []DeviceData) {
+func fileToStruct(i int, fc <-chan fs.DirEntry, dChan chan<- [][]DeviceData) {
 
 	f := <-fc
     defer wg.Done()
 
-	log.Println("Processing file: ", i)
 
 	var d []DeviceData
 	var re [][]string
@@ -39,11 +38,8 @@ func fileToStruct(i int, fc <-chan fs.DirEntry, dChan chan<- []DeviceData) {
 		re = append(re, record)
 	}
 
-	log.Println("file:", i, "records read", len(re))
-
     d = ParseRecord(re)
+    res := [][]DeviceData{d}
 
-	log.Println("records ready to write", len(d))
-
-	dChan <- d
+	dChan <- res
 }

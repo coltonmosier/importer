@@ -38,7 +38,9 @@ func InitDatabase() *sql.DB {
 	return db
 }
 
-func WriteDeviceData(data []DeviceData) {
+func WriteDeviceData(dChan <-chan []DeviceData) {
+	defer wg.Done()
+	data := <-dChan
 	stmt, err := db.Prepare("INSERT INTO devices(device_type, manufacturer, serial_number) VALUES(?, ?, ?)")
 	if err != nil {
 		log.Fatalf("%v: creating prepared statement\n", err)
@@ -50,5 +52,5 @@ func WriteDeviceData(data []DeviceData) {
 			log.Fatalf("%v: executing prepared statement %v\n", err, d)
 		}
 	}
-    stmt.Close()
+	stmt.Close()
 }

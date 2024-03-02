@@ -52,7 +52,8 @@ func main() {
 	// fs.DirEntry channel
 	fChan := make(chan fs.DirEntry, 5)
 	// DeviceData channel
-	dChan := make(chan []DeviceData)
+	dChan := make(chan [][]DeviceData)
+    wChan := make(chan []DeviceData, 1250)
 
 	for i := range Concurrency {
 		wg.Add(1)
@@ -68,6 +69,16 @@ func main() {
 	d := <-dChan
 	close(dChan)
 	wg.Wait() // we know all files have been read and processed
+    for i := range Concurrency {
+        wg.Add(1)
+        go WriteDeviceData(wChan)
+    }
+
+    for _, data := range d {
+        wChan <- data
+    }
+    close(wChan)
+    wg.Wait()
 
 	log.Println("size of data from files: ", len(d))
 
