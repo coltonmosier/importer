@@ -53,12 +53,14 @@ func ParseRecord(record []string) DeviceData {
 		return DeviceData{}
 	}
 
+    mu.Lock()
 	if slices.Contains(SerialNumbers, record[3]) {
         msg := fmt.Sprintf("Invalid Record: serial_number already exists [%s]\n", invalidRecord)
         Logger.AddWarn(Message{Message: msg, Time: time.Now()})
 		InvalidRecordCount++
 		return DeviceData{}
 	}
+    mu.Unlock()
 
 	if !strings.HasPrefix(record[3], "SN-") {
         msg := fmt.Sprintf("Invalid Record: serial_number invalid or in wrong position [%s]\n", invalidRecord)
@@ -74,8 +76,9 @@ func ParseRecord(record []string) DeviceData {
 		return DeviceData{}
 	}
 
+    mu.Lock()
 	SerialNumbers = append(SerialNumbers, record[3])
-
+    mu.Unlock()
 	return DeviceData{
 		device_type:   record[1],
 		manufacturer:  record[2],

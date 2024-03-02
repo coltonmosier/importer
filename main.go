@@ -14,6 +14,7 @@ import (
 var (
 	db                 *sql.DB
 	wg                 sync.WaitGroup
+	mu                 sync.Mutex
 	InvalidRecordCount = 0
 	Concurrency        int
 	SerialNumbers      = []string{}
@@ -48,17 +49,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-    // fs.DirEntry channel
+	// fs.DirEntry channel
 	fChan := make(chan fs.DirEntry, 5)
-    // DeviceData channel
+	// DeviceData channel
 	dChan := make(chan []DeviceData)
 
-    for i := range Concurrency {
-        wg.Add(1)
-        go fileToStruct(i+1,fChan, dChan)
-    }
+	for i := range Concurrency {
+		wg.Add(1)
+		go fileToStruct(i+1, fChan, dChan)
+	}
 	// Loop through the files and send them to the channel
-    // acts like a semaphore
+	// acts like a semaphore
 	for _, file := range files {
 		fChan <- file
 	}
