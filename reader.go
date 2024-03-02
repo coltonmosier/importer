@@ -38,6 +38,7 @@ func fileToStruct(i int, fc <-chan fs.DirEntry, dChan chan<- [][]DeviceData) {
 		re = append(re, record)
 	}
 
+    log.Println("Time to parse:", i)
     d = ParseRecord(re)
     res := [][]DeviceData{d}
 

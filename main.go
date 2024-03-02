@@ -69,7 +69,7 @@ func main() {
 	d := <-dChan
 	close(dChan)
 	wg.Wait() // we know all files have been read and processed
-    for i := range Concurrency {
+    for _ = range Concurrency {
         wg.Add(1)
         go WriteDeviceData(wChan)
     }
