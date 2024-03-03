@@ -51,7 +51,7 @@ func main() {
 	}
 
 	// fs.DirEntry channel buffered to 5 which means only 5 funcs at a time
-	fChan := make(chan fs.DirEntry, 5)
+	fChan := make(chan fs.DirEntry, Concurrency)
 
     var d []DeviceData
 
