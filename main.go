@@ -52,28 +52,27 @@ func main() {
 	// fs.DirEntry channel buffered to 5 which means only 5 funcs at a time
 	fChan := make(chan fs.DirEntry, Concurrency)
 
-    var d []DeviceData
-
+	var d []DeviceData
 
 	// Loop through the files and send them to the channel
 	// acts like a semaphore
 	for i, file := range files {
 		fChan <- file
-        go func() {
-            res := fileToStruct(i, file)
-            mu.Lock()
-            d = append(d, res...)
-            mu.Unlock()
-            <-fChan
-        }()
+		go func() {
+			res := fileToStruct(i, file)
+			mu.Lock()
+			d = append(d, res...)
+			mu.Unlock()
+			<-fChan
+		}()
 	}
 	close(fChan)
-    // Stop the CPU profiler
+	// Stop the CPU profiler
 
 	log.Println("size of data from files: ", len(d))
 
 	elapsed := time.Since(begin)
-    Logger.AddInfo(Message{"Time for all queries: " + elapsed.String(), time.Now()})
-    Logger.AddInfo(Message{"Invalid records: " + strconv.Itoa(InvalidRecordCount), time.Now()})
-    Logger.WriteLogs()
+	Logger.AddInfo(Message{"Time to process files:" + elapsed.String() + "\n", time.Now()})
+	Logger.AddInfo(Message{"Invalid records: " + strconv.Itoa(InvalidRecordCount) + "\n", time.Now()})
+	Logger.WriteLogs()
 }
