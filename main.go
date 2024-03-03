@@ -15,7 +15,6 @@ var (
 	db                 *sql.DB
 	wg                 sync.WaitGroup
 	mu                 sync.Mutex
-	InvalidRecordCount = 0
 	Concurrency        int
 	SerialNumbers      = []string{}
 	Logger             = Logs{}
@@ -53,14 +52,16 @@ func main() {
 	fChan := make(chan fs.DirEntry, Concurrency)
 
 	var d []DeviceData
+    var InvalidRecordCount int
 
 	// Loop through the files and send them to the channel
 	// acts like a semaphore
 	for i, file := range files {
 		fChan <- file
 		go func() {
-			res := fileToStruct(i, file)
+			res, cnt := fileToStruct(i, file)
 			mu.Lock()
+            InvalidRecordCount += cnt
 			d = append(d, res...)
 			mu.Unlock()
 			<-fChan

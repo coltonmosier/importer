@@ -15,7 +15,8 @@ var acceptedManufacturer = []string{"Apple", "Chevorlet", "Dell", "Ford", "GM", 
 
 
 // Parse will parse the csv file and return a DeviceData struct and will handle error/logging
-func ParseRecord(r [][]string) []DeviceData {
+func ParseRecord(r [][]string) ([]DeviceData, int) {
+    invalidRecordCount := 0
 
 	var d []DeviceData
 
@@ -30,7 +31,7 @@ func ParseRecord(r [][]string) []DeviceData {
 		if len(record) < 4 {
 			msg := fmt.Sprintf("Invalid Record: missing fields [%s]\n", invalidRecord)
 			Logger.AddWarn(Message{msg, time.Now()})
-			InvalidRecordCount++
+			invalidRecordCount++
 			continue
 		}
 
@@ -50,12 +51,12 @@ func ParseRecord(r [][]string) []DeviceData {
         if strings.Compare(serial, "") == 0 {
             msg := fmt.Sprintf("Invalid Record: serial_number missing [%s]\n", invalidRecord)
             Logger.AddWarn(Message{msg, time.Now()})
-            InvalidRecordCount++
+            invalidRecordCount++
             continue
         } else if len(serial) != 67 {
             msg := fmt.Sprintf("Invalid Record: serial_number invalid length [%s]\n", invalidRecord)
             Logger.AddWarn(Message{msg, time.Now()})
-            InvalidRecordCount++
+            invalidRecordCount++
             continue
         } 
         mu.Lock()
@@ -63,7 +64,7 @@ func ParseRecord(r [][]string) []DeviceData {
             mu.Unlock()
             msg := fmt.Sprintf("Invalid Record: serial_number already exists [%s]\n", invalidRecord)
             Logger.AddWarn(Message{msg, time.Now()})
-            InvalidRecordCount++
+            invalidRecordCount++
             continue
         }
         mu.Unlock()
@@ -78,5 +79,5 @@ func ParseRecord(r [][]string) []DeviceData {
 			serial_number: serial,
 		})
 	}
-	return d
+	return d, invalidRecordCount
 }

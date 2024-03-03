@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func fileToStruct(i int, fc fs.DirEntry) []DeviceData {
+func fileToStruct(i int, fc fs.DirEntry) ([]DeviceData, int) {
 
 
 
@@ -37,7 +37,7 @@ func fileToStruct(i int, fc fs.DirEntry) []DeviceData {
 	}
 
     log.Println("Time to parse:", i)
-    d = ParseRecord(re)
+    d, wrong  := ParseRecord(re)
 
-    return d
+    return d, wrong
 }
