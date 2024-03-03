@@ -26,15 +26,15 @@ type Message struct {
 
 func (l *Logs) AddInfo(msg Message) {
 	dt := msg.Time.Format("2006/01/02 15:04:05")
-	l.Info = append(l.Info, dt+"[INFO]"+msg.Message)
+	l.Info = append(l.Info, dt+" [INFO] "+msg.Message)
 }
 func (l *Logs) AddWarn(msg Message) {
 	dt := msg.Time.Format("2006/01/02 15:04:05")
-	l.Warn = append(l.Warn, dt+"[WARN]"+msg.Message)
+	l.Warn = append(l.Warn, dt+" [WARN] "+msg.Message)
 }
 func (l *Logs) AddErr(msg Message) {
 	dt := msg.Time.Format("2006/01/02 15:04:05")
-	l.Error = append(l.Error, dt+"[ERROR]"+msg.Message)
+	l.Error = append(l.Error, dt+" [ERROR] "+msg.Message)
 }
 
 func (l *Logs) ClearLogs() {
