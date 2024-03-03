@@ -5,7 +5,6 @@ import (
 	"io/fs"
 	"log"
 	"os"
-    "runtime/pprof"
 	"strconv"
 	"sync"
 	"time"
@@ -56,17 +55,12 @@ func main() {
     var d []DeviceData
 
 
-    // Start the CPU profiler
-    f, err := os.Create("cpu.prof")
-    if err != nil {
-        log.Fatal(err)
-    }
-    pprof.StartCPUProfile(f)
 	// Loop through the files and send them to the channel
 	// acts like a semaphore
 	for i, file := range files {
 		fChan <- file
         go func() {
+            wg.Add(1)
             res := fileToStruct(i, file)
             mu.Lock()
             d = append(d, res...)
@@ -76,7 +70,8 @@ func main() {
 	}
 	close(fChan)
     // Stop the CPU profiler
-    pprof.StopCPUProfile()
+
+    wg.Wait()
 
 	log.Println("size of data from files: ", len(d))
 

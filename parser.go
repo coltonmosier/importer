@@ -94,5 +94,6 @@ func ParseRecord(r [][]string) []DeviceData {
 			serial_number: record[3],
 		})
 	}
+    wg.Done()
 	return d
 }
