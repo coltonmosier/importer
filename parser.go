@@ -8,10 +8,10 @@ import (
 )
 
 var acceptedDeviceTypes = []string{"computer", "laptop", "mobile phone", "smart watch",
-	"tablet", "television", "vehicle"}
+	"tablet", "television", "vehicle", ""}
 var acceptedManufacturer = []string{"Apple", "Chevorlet", "Dell", "Ford", "GM", "Google", "HP",
 	"Hisense", "Huawei", "Hyundai", "IBM", "KIA", "LG", "Microsoft", "Motorola", "Nissan", "Nokia",
-	"OnePlus", "Panasonic", "Samsung", "Sony", "TCL", "Toyota", "Vizio"}
+	"OnePlus", "Panasonic", "Samsung", "Sony", "TCL", "Toyota", "Vizio", ""}
 
 // Parse will parse the csv file and return a DeviceData struct and will handle error/logging
 func ParseRecord(r [][]string) []DeviceData {
