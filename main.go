@@ -60,7 +60,6 @@ func main() {
 	for i, file := range files {
 		fChan <- file
         go func() {
-            wg.Add(1)
             res := fileToStruct(i, file)
             mu.Lock()
             d = append(d, res...)
@@ -70,8 +69,6 @@ func main() {
 	}
 	close(fChan)
     // Stop the CPU profiler
-
-    wg.Wait()
 
 	log.Println("size of data from files: ", len(d))
 
