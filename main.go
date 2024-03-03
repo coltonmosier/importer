@@ -49,9 +49,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// fs.DirEntry channel
+	// fs.DirEntry channel buffered to 5 which means only 5 funcs at a time
 	fChan := make(chan fs.DirEntry, 5)
-	// DeviceData channel
+
     var d []DeviceData
 
 
@@ -60,7 +60,10 @@ func main() {
 	for i, file := range files {
 		fChan <- file
         go func() {
-            d = append(d, fileToStruct(i, file)...)
+            res := fileToStruct(i, file)
+            mu.Lock()
+            d = append(d, res...)
+            mu.Unlock()
             <-fChan
         }()
 	}
