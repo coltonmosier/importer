@@ -32,7 +32,7 @@ func ParseDirtyRecord(r [][]string) ([]models.DeviceData, models.InvalidError) {
 
 		if len(record) < 4 {
 			msg := fmt.Sprintf("Invalid Record: missing fields [%s]\n", invalidRecord)
-			Logger.AddWarn(models.Message{Message: msg, Time: time.Now()})
+			Logger.AddErr(models.Message{Message: msg, Time: time.Now()})
             Logger.AddBadData(models.Message{Message: invalidRecord})
 			IE.MissingFields++
 			continue
