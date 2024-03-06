@@ -19,7 +19,7 @@ func WriteClean(d []models.DeviceData) {
 	// This loop is to convert the struct to a slice of slices of strings
 	for _, v := range d {
 		r = append(r, []string{strconv.Itoa(v.Line_number), v.Device_type,
-			v.Manufacturer, v.Serial_number})
+            v.Manufacturer, v.Serial_number})
 	}
 
 	// Write all the clean data to the clean file

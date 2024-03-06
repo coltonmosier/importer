@@ -10,11 +10,11 @@ import (
 )
 
 var (
-	acceptedDeviceTypes = []string{"computer", "laptop", "mobile phone", "smart watch",
-		"tablet", "television", "vehicle"}
-	acceptedManufacturer = []string{"Apple", "Chevorlet", "Dell", "Ford", "GM", "Google", "HP",
-		"Hisense", "Huawei", "Hyundai", "IBM", "KIA", "LG", "Microsoft", "Motorola", "Nissan",
-		"Nokia", "OnePlus", "Panasonic", "Samsung", "Sony", "TCL", "Toyota", "Vizio"}
+	acceptedDeviceTypes = map[string]int{"computer": 1, "laptop": 2, "mobile phone": 3, "smart watch": 4,
+		"tablet": 5, "television": 6, "vehicle": 7}
+	acceptedManufacturer = map[string]int{"Apple": 1, "Chevorlet": 2, "Dell": 3, "Ford": 4, "GM": 5, "Google": 6, "HP": 7,
+		"Hisense": 8, "Huawei": 9, "Hyundai": 10, "IBM": 11, "KIA": 12, "LG": 13, "Microsoft": 14, "Motorola": 15, "Nissan": 16,
+		"Nokia": 17, "OnePlus": 18, "Panasonic": 19, "Samsung": 20, "Sony": 21, "TCL": 22, "Toyota": 23, "Vizio": 24}
 )
 
 // Parse will parse the csv file and return a DeviceData struct and will handle error/logging
@@ -28,7 +28,7 @@ func ParseDirtyRecord(r [][]string) ([]models.DeviceData, int) {
 			Logger.WriteLogs()
 		}
 		invalidRecord := strings.Join(record, ",")
-		serial, device_type, manufacturer := "", "", ""
+        serial, manufacturer, device_type := "", "", ""
 
 		if len(record) < 4 {
 			msg := fmt.Sprintf("Invalid Record: missing fields [%s]\n", invalidRecord)
@@ -48,15 +48,15 @@ func ParseDirtyRecord(r [][]string) ([]models.DeviceData, int) {
 			}
 			if strings.HasPrefix(record[i], "SN-") {
 				serial = record[i]
-			} else if slices.Contains(acceptedDeviceTypes, record[i]) {
+			} else if _, ok := acceptedDeviceTypes[record[i]]; ok {
 				device_type = record[i]
-			} else if slices.Contains(acceptedManufacturer, record[i]) {
+			} else if _, ok := acceptedManufacturer[record[i]]; ok {
 				manufacturer = record[i]
 			}
 		}
 
 		// handle empty device_type
-		if strings.Compare(device_type, "") == 0 {
+		if  strings.Compare(device_type, "") == 0 {
 			msg := fmt.Sprintf("Invalid Record: device_type missing [%s]\n", invalidRecord)
 			Logger.AddErr(models.Message{Message: msg, Time: time.Now()})
 			invalidRecordCount++
