@@ -2,6 +2,7 @@ package cleaner
 
 import (
 	"database/sql"
+	"fmt"
 	"io/fs"
 	"log"
 	"os"
@@ -43,7 +44,7 @@ func main() {
 	fChan := make(chan fs.DirEntry, Concurrency)
 
 	var d []models.DeviceData
-	var invalidRecordCount int
+	var ic []models.InvalidError
 
 	// Loop through the files and send them to the channel
 	// acts like a semaphore
@@ -53,7 +54,7 @@ func main() {
 			r := internal.FileToStruct(i, file)
 			res, invalid := ParseDirtyRecord(r)
 			mu.Lock()
-			invalidRecordCount += invalid
+            ic = append(ic, invalid)
 			d = append(d, res...)
 			mu.Unlock()
 			<-fChan
@@ -71,8 +72,24 @@ func main() {
 	elapsed := time.Since(begin)
 	Logger.AddInfo(models.Message{Message: "Time to process all records:" + elapsed.String() + "\n",
 		Time: time.Now()})
-	Logger.AddInfo(models.Message{Message: "Invalid records: " + strconv.Itoa(invalidRecordCount) + "\n",
-		Time: time.Now()})
+
+    var invalid models.InvalidError
+    var totalInvalid int
+    for _, v := range ic {
+        invalid.MissingFields += v.MissingFields
+        invalid.DeviceTypeMissing += v.DeviceTypeMissing
+        invalid.ManufacturerMissing += v.ManufacturerMissing
+        invalid.SerialNumberMissing += v.SerialNumberMissing
+        invalid.SerialNumberLength += v.SerialNumberLength
+        invalid.SerialNumberExists += v.SerialNumberExists
+        totalInvalid += v.MissingFields + v.DeviceTypeMissing + v.ManufacturerMissing + v.SerialNumberMissing + v.SerialNumberLength + v.SerialNumberExists
+    }
+    invalidMsg := fmt.Sprintf("MissingFields: %d\nDeviceTypeMissing: %d\nManufacturerMissing: %d\nSerialNumberMissing: %d\nSerialNumberLength: %d\nSerialNumberExists: %d\n",
+        invalid.MissingFields, invalid.DeviceTypeMissing,
+        invalid.ManufacturerMissing, invalid.SerialNumberMissing, 
+        invalid.SerialNumberLength, invalid.SerialNumberExists)
+    Logger.AddInfo(models.Message{Message: invalidMsg, Time: time.Now()})
+    
 
 	Logger.WriteLogs()
 }

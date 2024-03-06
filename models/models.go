@@ -15,3 +15,12 @@ type Message struct {
 	Message string
 	Time    time.Time
 }
+
+type InvalidError struct {
+    MissingFields int
+    DeviceTypeMissing int
+    ManufacturerMissing int
+    SerialNumberMissing int
+    SerialNumberLength int
+    SerialNumberExists int
+}
