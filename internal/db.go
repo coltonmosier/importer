@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"database/sql"
@@ -9,11 +9,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type DeviceData struct {
-	device_type   string
-	manufacturer  string
-	serial_number string
-}
 
 func InitDatabase() *sql.DB {
 	err := godotenv.Load()
@@ -38,19 +33,3 @@ func InitDatabase() *sql.DB {
 	return db
 }
 
-func WriteDeviceData(dChan <-chan []DeviceData) {
-	defer wg.Done()
-	data := <-dChan
-	stmt, err := db.Prepare("INSERT INTO devices(device_type, manufacturer, serial_number) VALUES(?, ?, ?)")
-	if err != nil {
-		log.Fatalf("%v: creating prepared statement\n", err)
-	}
-
-	for _, d := range data {
-		_, err := stmt.Exec(d.device_type, d.manufacturer, d.serial_number)
-		if err != nil {
-			log.Fatalf("%v: executing prepared statement %v\n", err, d)
-		}
-	}
-	stmt.Close()
-}

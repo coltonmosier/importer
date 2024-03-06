@@ -1,4 +1,4 @@
-package main
+package importer
 
 import (
 	"database/sql"
@@ -8,16 +8,19 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"importer/internal"
+	"importer/models"
 )
 
 /* GLOBALS */
 var (
-	db                 *sql.DB
-	wg                 sync.WaitGroup
-	mu                 sync.Mutex
-	Concurrency        int
-	SerialNumbers      = []string{}
-	Logger             = Logs{}
+	db            *sql.DB
+	Wg            sync.WaitGroup
+	mu            sync.Mutex
+	Concurrency   int
+	SerialNumbers = []string{}
+	Logger        = internal.Logs{}
 )
 
 const DATA_DIR = "/home/ubuntu/data/"
@@ -25,7 +28,7 @@ const DATA_DIR = "/home/ubuntu/data/"
 func main() {
 	begin := time.Now()
 
-	db = InitDatabase()
+	db = internal.InitDatabase()
 	defer db.Close()
 	db.SetMaxOpenConns(50)
 	db.SetMaxIdleConns(50)
@@ -51,17 +54,17 @@ func main() {
 	// fs.DirEntry channel buffered to 5 which means only 5 funcs at a time
 	fChan := make(chan fs.DirEntry, Concurrency)
 
-	var d []DeviceData
-    var InvalidRecordCount int
+	var d []models.DeviceData
+	var InvalidRecordCount int
 
 	// Loop through the files and send them to the channel
 	// acts like a semaphore
 	for i, file := range files {
 		fChan <- file
 		go func() {
-			res, cnt := fileToStruct(i, file)
+			res, cnt := internal.FileToStruct(i, file)
 			mu.Lock()
-            InvalidRecordCount += cnt
+			InvalidRecordCount += cnt
 			d = append(d, res...)
 			mu.Unlock()
 			<-fChan
@@ -73,7 +76,7 @@ func main() {
 	log.Println("size of data from files: ", len(d))
 
 	elapsed := time.Since(begin)
-	Logger.AddInfo(Message{"Time to process files:" + elapsed.String() + "\n", time.Now()})
-	Logger.AddInfo(Message{"Invalid records: " + strconv.Itoa(InvalidRecordCount) + "\n", time.Now()})
+	Logger.AddInfo(models.Message{Message: "Time to process files:" + elapsed.String() + "\n", Time: time.Now()})
+	Logger.AddInfo(models.Message{Message: "Invalid records: " + strconv.Itoa(InvalidRecordCount) + "\n", Time: time.Now()})
 	Logger.WriteLogs()
 }

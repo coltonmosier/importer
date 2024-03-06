@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"encoding/csv"
@@ -7,11 +7,12 @@ import (
 	"os"
 )
 
-func fileToStruct(i int, fc fs.DirEntry) ([]DeviceData, int) {
+var DATA_DIR = os.Getenv("DATA_DIR")
+
+func FileToStruct(i int, fc fs.DirEntry) [][]string{
 
 
 
-	var d []DeviceData
 	var re [][]string
 
 	// Open the file
@@ -36,8 +37,5 @@ func fileToStruct(i int, fc fs.DirEntry) ([]DeviceData, int) {
 		re = append(re, record)
 	}
 
-    log.Println("Time to parse:", i)
-    d, wrong  := ParseRecord(re)
-
-    return d, wrong
+    return re
 }

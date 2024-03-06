@@ -1,15 +1,15 @@
-package main
+package internal
 
 import (
 	"log"
 	"os"
-	"time"
+
+	"importer/models"
 )
 
-const (
-	INFO_LOG_FILE  = "/home/ubuntu/logs/importer_info.log"
-	WARN_LOG_FILE  = "/home/ubuntu/logs/importer_warn.log"
-	ERROR_LOG_FILE = "/home/ubuntu/logs/importer_error.log"
+var (
+    LOG_FILE = os.Getenv("ERROR_LOG_FILE")
+    BAD_DATA_FILE = os.Getenv("BAD_DATA_FILE")
 )
 
 // Struct to hold logging information for the application
@@ -19,20 +19,15 @@ type Logs struct {
 	Error []string
 }
 
-type Message struct {
-	Message string
-	Time    time.Time
-}
-
-func (l *Logs) AddInfo(msg Message) {
+func (l *Logs) AddInfo(msg models.Message) {
 	dt := msg.Time.Format("2006/01/02 15:04:05")
 	l.Info = append(l.Info, dt+" [INFO] "+msg.Message)
 }
-func (l *Logs) AddWarn(msg Message) {
+func (l *Logs) AddWarn(msg models.Message) {
 	dt := msg.Time.Format("2006/01/02 15:04:05")
 	l.Warn = append(l.Warn, dt+" [WARN] "+msg.Message)
 }
-func (l *Logs) AddErr(msg Message) {
+func (l *Logs) AddErr(msg models.Message) {
 	dt := msg.Time.Format("2006/01/02 15:04:05")
 	l.Error = append(l.Error, dt+" [ERROR] "+msg.Message)
 }
@@ -44,7 +39,7 @@ func (l *Logs) ClearLogs() {
 }
 
 func (l *Logs) WriteLogs() {
-	infoFile, err := os.OpenFile(INFO_LOG_FILE, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+	infoFile, err := os.OpenFile(LOG_FILE, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -53,7 +48,7 @@ func (l *Logs) WriteLogs() {
 		infoFile.WriteString(msg)
 	}
 
-	warnFile, err := os.OpenFile(WARN_LOG_FILE, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+	warnFile, err := os.OpenFile(LOG_FILE, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -62,7 +57,7 @@ func (l *Logs) WriteLogs() {
 		warnFile.WriteString(msg)
 	}
 
-	errorFile, err := os.OpenFile(ERROR_LOG_FILE, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+	errorFile, err := os.OpenFile(LOG_FILE, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
