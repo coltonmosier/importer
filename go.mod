@@ -1,4 +1,4 @@
-module importer
+module aswe-importer
 
 go 1.22
 

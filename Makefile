@@ -1,10 +1,5 @@
-all: cleaner importer
-
-cleaner: 
-	go build -o bin/cleaner ./cmd/cleaner/*
-
-importer: 
-	go build -o bin/importer ./cmd/importer/*
+aswe-importer: main.go
+	go build -o bin/aswe-importer .
 
 clean:
-	rm -f bin/cleaner bin/importer
+	rm -f bin/aswe-importer

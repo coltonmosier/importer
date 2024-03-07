@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-var DATA_DIR = os.Getenv("DATA_DIR")
+var DATA_DIR = "data/dirty/"
 
 func FileToStruct(i int, fc fs.DirEntry) [][]string{
 
@@ -18,6 +18,7 @@ func FileToStruct(i int, fc fs.DirEntry) [][]string{
 	// Open the file
 	file, err := os.Open(DATA_DIR + fc.Name())
 	if err != nil {
+        log.Println("Error opening file in filetostruct: ", fc.Name())
 		log.Fatal(err)
 	}
 	defer file.Close()

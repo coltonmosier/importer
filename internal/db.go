@@ -6,15 +6,10 @@ import (
 	"os"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/joho/godotenv"
 )
 
 
 func InitDatabase() *sql.DB {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file ", err)
-	}
 
 	cfg := mysql.Config{
 		User:                 os.Getenv("MYSQL_USER"),

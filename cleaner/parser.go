@@ -1,10 +1,9 @@
 package cleaner
 
 import (
+	"aswe-importer/models"
 	"fmt"
-	"importer/models"
 	"slices"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -21,27 +20,21 @@ var (
 func ParseDirtyRecord(r [][]string) ([]models.DeviceData, models.InvalidError) {
 
 	var d []models.DeviceData
-    var IE models.InvalidError
+	var IE models.InvalidError
 
-	for i, record := range r {
-		if i%1000 == 0 {
-			Logger.WriteLogs()
-		}
+	for _, record := range r {
 		invalidRecord := strings.Join(record, ",")
-        serial, manufacturer, device_type := "", "", ""
+		line_number, serial, manufacturer, device_type := "", "", "", ""
 
 		if len(record) < 4 {
 			msg := fmt.Sprintf("Invalid Record: missing fields [%s]\n", invalidRecord)
 			Logger.AddErr(models.Message{Message: msg, Time: time.Now()})
-            Logger.AddBadData(models.Message{Message: invalidRecord})
+			Logger.AddBadData(models.Message{Message: invalidRecord})
 			IE.MissingFields++
 			continue
 		}
 		// NOTE: this should not error since we know every line has a line number...
-		line_number, err := strconv.Atoi(record[0])
-		if err != nil {
-			panic(err)
-		}
+		line_number = record[0]
 
 		for i := 1; i < len(record); i++ {
 			if strings.Contains(record[i], "'") {
@@ -57,10 +50,10 @@ func ParseDirtyRecord(r [][]string) ([]models.DeviceData, models.InvalidError) {
 		}
 
 		// handle empty device_type
-		if  strings.Compare(device_type, "") == 0 {
+		if strings.Compare(device_type, "") == 0 {
 			msg := fmt.Sprintf("Invalid Record: device_type missing [%s]\n", invalidRecord)
 			Logger.AddErr(models.Message{Message: msg, Time: time.Now()})
-            Logger.AddBadData(models.Message{Message: invalidRecord})
+			Logger.AddBadData(models.Message{Message: invalidRecord})
 			IE.DeviceTypeMissing++
 			continue
 		}
@@ -69,7 +62,7 @@ func ParseDirtyRecord(r [][]string) ([]models.DeviceData, models.InvalidError) {
 		if strings.Compare(manufacturer, "") == 0 {
 			msg := fmt.Sprintf("Invalid Record: manufacturer missing [%s]\n", invalidRecord)
 			Logger.AddErr(models.Message{Message: msg, Time: time.Now()})
-            Logger.AddBadData(models.Message{Message: invalidRecord})
+			Logger.AddBadData(models.Message{Message: invalidRecord})
 			IE.ManufacturerMissing++
 			continue
 		}
@@ -78,13 +71,13 @@ func ParseDirtyRecord(r [][]string) ([]models.DeviceData, models.InvalidError) {
 		if strings.Compare(serial, "") == 0 {
 			msg := fmt.Sprintf("Invalid Record: serial_number missing [%s]\n", invalidRecord)
 			Logger.AddErr(models.Message{Message: msg, Time: time.Now()})
-            Logger.AddBadData(models.Message{Message: invalidRecord})
+			Logger.AddBadData(models.Message{Message: invalidRecord})
 			IE.SerialNumberMissing++
 			continue
 		} else if len(serial) != 67 {
 			msg := fmt.Sprintf("Invalid Record: serial_number invalid length [%s]\n", invalidRecord)
 			Logger.AddErr(models.Message{Message: msg, Time: time.Now()})
-            Logger.AddBadData(models.Message{Message: invalidRecord})
+			Logger.AddBadData(models.Message{Message: invalidRecord})
 			IE.SerialNumberLength++
 			continue
 		}
@@ -93,7 +86,7 @@ func ParseDirtyRecord(r [][]string) ([]models.DeviceData, models.InvalidError) {
 			mu.Unlock()
 			msg := fmt.Sprintf("Invalid Record: serial_number already exists [%s]\n", invalidRecord)
 			Logger.AddErr(models.Message{Message: msg, Time: time.Now()})
-            Logger.AddBadData(models.Message{Message: invalidRecord})
+			Logger.AddBadData(models.Message{Message: invalidRecord})
 			IE.SerialNumberExists++
 			continue
 		}

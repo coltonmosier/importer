@@ -5,7 +5,7 @@ import (
 )
 
 type DeviceData struct {
-	Line_number   int
+	Line_number   string
 	Device_type   string
 	Manufacturer  string
 	Serial_number string
@@ -17,10 +17,10 @@ type Message struct {
 }
 
 type InvalidError struct {
-    MissingFields int
-    DeviceTypeMissing int
-    ManufacturerMissing int
-    SerialNumberMissing int
-    SerialNumberLength int
-    SerialNumberExists int
+	MissingFields       int
+	DeviceTypeMissing   int
+	ManufacturerMissing int
+	SerialNumberMissing int
+	SerialNumberLength  int
+	SerialNumberExists  int
 }

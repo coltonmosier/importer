@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"importer/internal"
-	"importer/models"
+	"aswe-importer/internal"
+	"aswe-importer/models"
 )
 
 /* GLOBALS */

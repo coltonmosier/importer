@@ -4,14 +4,7 @@ import (
 	"log"
 	"os"
 
-	"importer/models"
-)
-
-var (
-	// contains speeds, errors, and warnings
-	LOG_FILE = os.Getenv("ERROR_LOG_FILE")
-	// contains the bad data
-	BAD_DATA_FILE = os.Getenv("BAD_DATA_FILE")
+	"aswe-importer/models"
 )
 
 // Struct to hold logging information for the application
@@ -46,9 +39,16 @@ func (l *Logs) ClearLogs() {
 	l.BadData = []string{}
 }
 
+func NewLogger() *Logs {
+    return &Logs{}
+}
+
 func (l *Logs) WriteLogs() {
+    LOG_FILE := os.Getenv("LOG_FILE")
+	// contains the bad data
 	logFile, err := os.OpenFile(LOG_FILE, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
+        log.Println("Error opening log file: ", LOG_FILE)
 		log.Fatal(err)
 	}
 	defer logFile.Close()
@@ -63,12 +63,14 @@ func (l *Logs) WriteLogs() {
 	for _, msg := range l.Error {
 		logFile.WriteString(msg)
 	}
-	l.ClearLogs()
+    l.writeBadData()
 }
 
-func (l *Logs) WriteBadData() {
+func (l *Logs) writeBadData() {
+    BAD_DATA_FILE := os.Getenv("BAD_DATA_FILE")
 	badDataFile, err := os.OpenFile(BAD_DATA_FILE, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
+        log.Println("Error opening bad data file: ", BAD_DATA_FILE)
 		log.Fatal(err)
 	}
 	defer badDataFile.Close()

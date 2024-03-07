@@ -1,7 +1,7 @@
 package importer
 
 import (
-	"importer/models"
+	"aswe-importer/models"
 	"log"
 )
 
