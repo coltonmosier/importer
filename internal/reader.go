@@ -8,6 +8,7 @@ import (
 )
 
 var DATA_DIR = "data/dirty/"
+var CLEAN_DIR = "data/clean/"
 
 func FileToStruct(i int, fc fs.DirEntry) [][]string{
 
@@ -16,7 +17,7 @@ func FileToStruct(i int, fc fs.DirEntry) [][]string{
 	var re [][]string
 
 	// Open the file
-	file, err := os.Open(DATA_DIR + fc.Name())
+	file, err := os.Open(CLEAN_DIR + fc.Name())
 	if err != nil {
         log.Println("Error opening file in filetostruct: ", fc.Name())
 		log.Fatal(err)

@@ -15,8 +15,7 @@ var (
 
 // WriteDeviceData writes the device data to the database
 func WriteDeviceData(data []models.DeviceData) {
-	defer Wg.Done()
-	stmt, err := db.Prepare("INSERT INTO serial_numbers(device_type, manufacturer, serial_number) VALUES(?, ?, ?)")
+	stmt, err := db.Prepare("INSERT INTO serial_numbers(device_type_id, manufacturer_id, serial_number) VALUES(?, ?, ?)")
 	if err != nil {
 		log.Fatalf("%v: creating prepared statement\n", err)
 	}

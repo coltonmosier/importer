@@ -44,7 +44,7 @@ func NewLogger() *Logs {
 }
 
 func (l *Logs) WriteLogs() {
-    LOG_FILE := os.Getenv("LOG_FILE")
+    LOG_FILE := os.Getenv("ERROR_LOG_FILE")
 	// contains the bad data
 	logFile, err := os.OpenFile(LOG_FILE, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
@@ -63,7 +63,9 @@ func (l *Logs) WriteLogs() {
 	for _, msg := range l.Error {
 		logFile.WriteString(msg)
 	}
-    l.writeBadData()
+    if len(l.BadData) > 0 {
+        l.writeBadData()
+    }
 }
 
 func (l *Logs) writeBadData() {
