@@ -3,6 +3,7 @@ package importer
 import (
 	"aswe-importer/models"
 	"log"
+	"time"
 )
 
 var (
@@ -20,13 +21,20 @@ func WriteDeviceData(data []models.DeviceData) {
 		log.Fatalf("%v: creating prepared statement\n", err)
 	}
 
-	for _, d := range data {
-        dt := acceptedDeviceTypes[d.Device_type]
-        m := acceptedManufacturer[d.Manufacturer]
-		_, err := stmt.Exec(dt, m, d.Serial_number)
-		if err != nil {
-			log.Fatalf("%v: executing prepared statement %v\n", err, d)
+	go func() {
+        start := time.Now()
+		defer stmt.Close()
+		Wg.Add(1)
+		for _, d := range data {
+			dt := acceptedDeviceTypes[d.Device_type]
+			m := acceptedManufacturer[d.Manufacturer]
+			_, err := stmt.Exec(dt, m, d.Serial_number)
+			if err != nil {
+				log.Fatalf("%v: executing prepared statement %v\n", err, d)
+			}
 		}
-	}
-	stmt.Close()
+        log.Printf("WriteDeviceData took %v\n", time.Since(start))
+        log.Printf("Queries per second: %v\n", float64(len(data))/time.Since(start).Seconds())
+        Wg.Done()
+	}()
 }

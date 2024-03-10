@@ -14,10 +14,6 @@ func ParseCleanRecord(record [][]string) {
 			Manufacturer:  v[2],
 			Serial_number: v[3],
 		})
-		if len(d) == 5000 {
-			WriteDeviceData(d)
-            d = nil
-		}
 	}
 	WriteDeviceData(d)
 }
