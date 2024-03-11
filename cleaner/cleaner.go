@@ -16,7 +16,7 @@ import (
 /* GLOBALS */
 var (
 	db            *sql.DB
-	mu            sync.Mutex
+	mu            sync.RWMutex
 	Wg            sync.WaitGroup
 	Concurrency   int
 	SerialNumbers = []string{}

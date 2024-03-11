@@ -49,9 +49,20 @@ func ParseDirtyRecord(r [][]string) ([]models.DeviceData, models.InvalidError) {
 			}
 		}
 
+		if strings.Compare(serial, "") == 0 &&
+			strings.Compare(device_type, "") == 0 &&
+			strings.Compare(manufacturer, "") == 0 {
+
+			msg := fmt.Sprintf("empty record [%s]\n", invalidRecord)
+			Logger.AddErr(models.Message{Message: msg, Time: time.Now()})
+			Logger.AddBadData(models.Message{Message: invalidRecord})
+			IE.MissingFields++
+			continue
+		}
+
 		// handle empty device_type
 		if strings.Compare(device_type, "") == 0 {
-			msg := fmt.Sprintf("Invalid Record: device_type missing [%s]\n", invalidRecord)
+			msg := fmt.Sprintf("device_type missing [%s]\n", invalidRecord)
 			Logger.AddErr(models.Message{Message: msg, Time: time.Now()})
 			Logger.AddBadData(models.Message{Message: invalidRecord})
 			IE.DeviceTypeMissing++
@@ -60,7 +71,7 @@ func ParseDirtyRecord(r [][]string) ([]models.DeviceData, models.InvalidError) {
 
 		// handle empty manufacturer
 		if strings.Compare(manufacturer, "") == 0 {
-			msg := fmt.Sprintf("Invalid Record: manufacturer missing [%s]\n", invalidRecord)
+			msg := fmt.Sprintf("manufacturer missing [%s]\n", invalidRecord)
 			Logger.AddErr(models.Message{Message: msg, Time: time.Now()})
 			Logger.AddBadData(models.Message{Message: invalidRecord})
 			IE.ManufacturerMissing++
@@ -69,28 +80,28 @@ func ParseDirtyRecord(r [][]string) ([]models.DeviceData, models.InvalidError) {
 
 		// handle all serial number errors
 		if strings.Compare(serial, "") == 0 {
-			msg := fmt.Sprintf("Invalid Record: serial_number missing [%s]\n", invalidRecord)
+			msg := fmt.Sprintf("serial_number missing [%s]\n", invalidRecord)
 			Logger.AddErr(models.Message{Message: msg, Time: time.Now()})
 			Logger.AddBadData(models.Message{Message: invalidRecord})
 			IE.SerialNumberMissing++
 			continue
 		} else if len(serial) != 67 {
-			msg := fmt.Sprintf("Invalid Record: serial_number invalid length [%s]\n", invalidRecord)
+			msg := fmt.Sprintf("serial_number invalid length [%s]\n", invalidRecord)
 			Logger.AddErr(models.Message{Message: msg, Time: time.Now()})
 			Logger.AddBadData(models.Message{Message: invalidRecord})
 			IE.SerialNumberLength++
 			continue
 		}
-		mu.Lock()
+		mu.RLock()
 		if slices.Contains(SerialNumbers, serial) {
-			mu.Unlock()
-			msg := fmt.Sprintf("Invalid Record: serial_number already exists [%s]\n", invalidRecord)
+			mu.RUnlock()
+			msg := fmt.Sprintf("serial_number already exists [%s]\n", invalidRecord)
 			Logger.AddErr(models.Message{Message: msg, Time: time.Now()})
 			Logger.AddBadData(models.Message{Message: invalidRecord})
 			IE.SerialNumberExists++
 			continue
 		}
-		mu.Unlock()
+		mu.RUnlock()
 
 		mu.Lock()
 		SerialNumbers = append(SerialNumbers, record[3])
