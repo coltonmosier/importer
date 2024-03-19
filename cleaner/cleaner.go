@@ -78,6 +78,7 @@ func cleaner() {
 
 	var invalid models.InvalidError
 	var totalInvalid int
+    var cleaned int
 	for _, v := range ic {
 		invalid.MissingFields += v.MissingFields
 		invalid.DeviceTypeMissing += v.DeviceTypeMissing
@@ -85,12 +86,18 @@ func cleaner() {
 		invalid.SerialNumberMissing += v.SerialNumberMissing
 		invalid.SerialNumberLength += v.SerialNumberLength
 		invalid.SerialNumberExists += v.SerialNumberExists
+        invalid.ContainQuotes += v.ContainQuotes
+        invalid.LongFields += v.LongFields
+        cleaned += v.ContainQuotes + v.LongFields
 		totalInvalid += v.MissingFields + v.DeviceTypeMissing + v.ManufacturerMissing + v.SerialNumberMissing + v.SerialNumberLength + v.SerialNumberExists
 	}
 
 	Logger.AddInfo(models.Message{Message: "Total invalid records: " + strconv.Itoa(totalInvalid) + "\n", Time: time.Now()})
+    Logger.AddInfo(models.Message{Message: "Total cleaned records: " + strconv.Itoa(cleaned) + "\n", Time: time.Now()})
 	Logger.AddInfo(models.Message{Message: "size of clean data from files: " + strconv.Itoa(len(d)) + "\n",
 		Time: time.Now()})
+    Logger.AddInfo(models.Message{Message: "records with quotes: " + strconv.Itoa(invalid.ContainQuotes) + "\n", Time: time.Now()})
+    Logger.AddInfo(models.Message{Message: "records with too many fields: " + strconv.Itoa(invalid.LongFields) + "\n", Time: time.Now()})
     Logger.AddInfo(models.Message{Message: "records with missing fields: " + strconv.Itoa(invalid.MissingFields) + "\n", Time: time.Now()})
     Logger.AddInfo(models.Message{Message: "records with missing device type: " + strconv.Itoa(invalid.DeviceTypeMissing) + "\n", Time: time.Now()})
     Logger.AddInfo(models.Message{Message: "records with missing manufacturer: " + strconv.Itoa(invalid.ManufacturerMissing) + "\n", Time: time.Now()})

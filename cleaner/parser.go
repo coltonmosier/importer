@@ -36,9 +36,13 @@ func ParseDirtyRecord(r [][]string) ([]models.DeviceData, models.InvalidError) {
 		// NOTE: this should not error since we know every line has a line number...
 		line_number = record[0]
 
+
 		for i := 1; i < len(record); i++ {
 			if strings.Contains(record[i], "'") {
 				record[i] = strings.ReplaceAll(record[i], "'", "")
+                msg := fmt.Sprintf("Record contained single quote [%s]\n", invalidRecord)
+                Logger.AddErr(models.Message{Message: msg, Time: time.Now()})
+                IE.ContainQuotes++
 			}
 			if strings.HasPrefix(record[i], "SN-") {
 				serial = record[i]
@@ -59,6 +63,13 @@ func ParseDirtyRecord(r [][]string) ([]models.DeviceData, models.InvalidError) {
 			IE.MissingFields++
 			continue
 		}
+
+        // handle long fields
+        if len(record) > 4 {
+            msg := fmt.Sprintf("Record has too many fields (too many commas) [%s]\n", invalidRecord)
+            Logger.AddErr(models.Message{Message: msg, Time: time.Now()})
+            IE.LongFields++
+        }
 
 		// handle empty device_type
 		if strings.Compare(device_type, "") == 0 {

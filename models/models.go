@@ -17,6 +17,8 @@ type Message struct {
 }
 
 type InvalidError struct {
+    ContainQuotes       int
+    LongFields          int
 	MissingFields       int
 	DeviceTypeMissing   int
 	ManufacturerMissing int
